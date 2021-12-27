@@ -330,7 +330,7 @@ func GetDwonUrlAndDoubanUrl(dy *Dy) Dy {
 	})
 	dy.DownUrl = down_Urls
 
-	dy.DoubanId, _ = doc.Find(".rating_num").Attr("subject")
+	dy.DoubanUrl, _ = doc.Find(".rating_num a").Attr("href")
 
 	return *dy
 }
