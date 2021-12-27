@@ -97,6 +97,35 @@ type Dy struct {
 	DownCount         int `bson:"down_count"`
 }
 
+func ClickPages(url string) {
+	// create chrome instance
+	ctx, cancel := chromedp.NewContext(
+		context.Background(),
+		chromedp.WithDebugf(log.Printf),
+	)
+	defer cancel()
+
+	// create a timeout
+	ctx, cancel = context.WithTimeout(ctx, 15*time.Second)
+	defer cancel()
+
+	// navigate to a page, wait for an element, click
+	var example string
+	err := chromedp.Run(ctx,
+		chromedp.Navigate(url),
+		// wait for footer element is visible (ie, page is loaded)
+		chromedp.WaitVisible(`body > pagination`),
+		// find and click "Example" link
+		chromedp.Click(`pagination/li[5]`, chromedp.NodeVisible),
+		// retrieve the text of the textarea
+		chromedp.Value(`#example-After textarea`, &example),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("Go's time.After example:\n%s", example)
+}
+
 func main() {
 	url := "https://www.domp4.cc/list/99-1.html"
 	dy := &Dy{}

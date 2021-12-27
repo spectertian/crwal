@@ -28,3 +28,9 @@ func TestGetContentNewAll(t *testing.T) {
 	t.Log(ss.Stars)
 
 }
+
+func TestClickPage(t *testing.T) {
+	url := "https://pkg.go.dev/time"
+	url = "https://www.domp4.cc/list/99-1.html"
+	ClickPages(url)
+}
