@@ -297,10 +297,10 @@ func GetContent(dy *Dy) Dy {
 	})
 	dy.Director = dirct
 
-	dy.Area = strings.TrimSpace(doc.Find(".text p").Eq(3).Find("span").Text())
-	dy.Year = strings.TrimSpace(doc.Find(".text p").Eq(4).Find("span").Text())
-	dy.Language = strings.TrimSpace(doc.Find(".text p").Eq(5).Find("span").Text())
-	dy.RunTime = strings.TrimSpace(doc.Find(".text p").Eq(6).Find("span").Text())
+	dy.Area = strings.TrimSpace(doc.Find(".director").Next().Find("span").Text())
+	dy.Year = strings.TrimSpace(doc.Find(".director").Next().Next().Find("span").Text())
+	dy.Language = strings.TrimSpace(doc.Find(".director").Next().Next().Next().Find("span").Text())
+	dy.RunTime = strings.TrimSpace(doc.Find(".director").Next().Next().Next().Next().Find("span").Text())
 
 	tags := []string{}
 	doc.Find(".text .tag a").Each(func(i int, s *goquery.Selection) {
