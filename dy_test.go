@@ -14,6 +14,6 @@ func TestGetContent(t *testing.T) {
 func TestGetContentNew(t *testing.T) {
 	dy := &Dy{}
 	dy.Url = "https://www.domp4.cc//html/7yt48T44444T.html"
-	ss := GetContentNew(dy)
+	ss := GetDwonUrlAndDoubanUrl(dy)
 	t.Log(ss)
 }

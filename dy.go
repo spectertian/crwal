@@ -197,7 +197,6 @@ func main() {
 
 func GetContentNewAll(dy *Dy) Dy {
 	htmlContent, _ := GetHttpHtmlContent(dy.Url, "#download1", "document.querySelector(\"body\")")
-
 	fmt.Println(htmlContent)
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
@@ -325,10 +324,9 @@ func GetDwonUrlAndDoubanUrl(dy *Dy) Dy {
 	doc.Find(".url-left").Each(func(i int, s *goquery.Selection) {
 		t, _ := s.Find(".url-left a").Attr("title")
 		h, _ := s.Find(".url-left a").Attr("href")
-		reg, _ := regexp.Compile(`.*:`)
-		n_type := reg.FindString(h)
+		reg, _ := regexp.Compile(`[^:]+`)
 
-		down_Urls = append(down_Urls, DownStruct{t, h, n_type})
+		down_Urls = append(down_Urls, DownStruct{t, h, reg.FindString(h)})
 	})
 	dy.DownUrl = down_Urls
 
