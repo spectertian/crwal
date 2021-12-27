@@ -22,7 +22,9 @@ func TestGetContentNew(t *testing.T) {
 func TestGetContentNewAll(t *testing.T) {
 	dy := &Dy{}
 	dy.Url = "https://www.domp4.cc//html/ReoDhDBBBBBD.html"
+	dy.Url = "https://www.domp4.cc//detail/12589.html"
 	ss := GetContentNewAll(dy)
-	t.Log(ss)
+	t.Log(ss.Director)
+	t.Log(ss.Stars)
 
 }

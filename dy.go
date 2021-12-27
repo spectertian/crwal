@@ -189,7 +189,7 @@ func GetContentNewAll(dy *Dy) Dy {
 	dy.DoubanId, _ = doc.Find(".rating_num").Attr("subject")
 
 	star := []string{}
-	doc.Find(".text .attrs span").Each(func(i int, s *goquery.Selection) {
+	doc.Find(".actor .attrs span").Each(func(i int, s *goquery.Selection) {
 		star = append(star, strings.TrimSpace(s.Find("a").Text()))
 	})
 	dy.Stars = star
@@ -258,7 +258,7 @@ func GetContent(dy *Dy) Dy {
 	dy.Alias = re_alias
 
 	star := []string{}
-	doc.Find(".text .attrs span").Each(func(i int, s *goquery.Selection) {
+	doc.Find(".actor .attrs span").Each(func(i int, s *goquery.Selection) {
 		star = append(star, strings.TrimSpace(s.Find("a").Text()))
 	})
 	dy.Stars = star
