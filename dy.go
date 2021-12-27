@@ -338,7 +338,7 @@ func GetDwonUrlAndDoubanUrl(dy *Dy) Dy {
 //获取网站上爬取的数据
 func GetHttpHtmlContent(url string, selector string, sel interface{}) (string, error) {
 	options := []chromedp.ExecAllocatorOption{
-		chromedp.Flag("headless", false), // debug使用
+		chromedp.Flag("headless", true), // debug使用
 		chromedp.Flag("blink-settings", "imagesEnabled=false"),
 		chromedp.UserAgent(`Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36`),
 	}
