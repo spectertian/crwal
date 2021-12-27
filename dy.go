@@ -58,7 +58,7 @@ func IsBookOk(url string) string {
 	return result.ID.Hex()
 }
 
-func IsChapterOk(url string) string {
+func IsDyListOk(url string) string {
 	//panic(2)
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found")
@@ -79,7 +79,7 @@ func IsChapterOk(url string) string {
 		}
 	}()
 
-	coll := client.Database("dzs").Collection("chapter")
+	coll := client.Database("dy").Collection("list")
 	var result Default
 	err = coll.FindOne(context.TODO(), bson.D{{"url", url}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
@@ -100,12 +100,13 @@ type DownStruct struct {
 type Dy struct {
 	CId               string `bson:"c_id"`
 	RId               string `bson:"r_id"`
-	Introduction      string
 	Title             string
-	Alias             string
+	Alias             []string
+	LongTitle         string `bson:"long_title"`
 	Pic               string
 	Director          []string
 	Stars             []string
+	Introduction      string
 	DownStatus        int
 	LastUpdated       string `bson:"last_updated"`
 	UpdatedDate       string `bson:"updated_date"`
@@ -114,6 +115,8 @@ type Dy struct {
 	ProductionDate    string    `bson:"production_date"`
 	PageDate          string    `bson:"page_date"`
 	Rating            string
+	DoubanUrl         string `bson:"douban_url"`
+	DoubanId          string `bson:"douban_id"`
 	Tags              []string
 	Type              []string
 	Url               string
@@ -151,7 +154,7 @@ func main() {
 
 	doc.Find("#list_dy ul li").Each(func(i int, s *goquery.Selection) {
 		hrefs, _ := s.Find("a").Attr("href")
-		dy.Alias = strings.TrimSpace(s.Find("a").Text())
+		dy.LongTitle = strings.TrimSpace(s.Find("a").Text())
 		dy.PageDate = strings.TrimSpace(s.Find("span").Text())
 		dy.Url = domin + strings.TrimSpace(hrefs)
 		dy.DownStatus = 0
@@ -163,27 +166,96 @@ func main() {
 			fmt.Println("不存在url", dy)
 			return
 		}
-		ch <- *dy
 
-		fmt.Println("存在url", dy)
+		if IsDyListOk(dy.Url) != "" {
+			fmt.Println("已保存数据", dy.LongTitle)
+			return
+		} else {
+			fmt.Println("开始抓取", dy.LongTitle)
+		}
+
+		go func() {
+			ch <- *dy
+		}()
 
 	})
-	//panic(55)
 
-	close(ch)
+	//close(ch)
 	for {
 		select {
 		case dy := <-ch:
-			day := GetContent(&dy)
-			SaveDy(&day)
+			dys := GetContent(&dy)
+			dy_info := GetDwonUrlAndDoubanUrl(&dys)
+			SaveDy(&dy_info)
 			break
 		default:
 			fmt.Printf("no communication\n")
 
 		}
-
 	}
+}
 
+func GetContentNewAll(dy *Dy) Dy {
+	htmlContent, _ := GetHttpHtmlContent(dy.Url, "#download1", "document.querySelector(\"body\")")
+
+	fmt.Println(htmlContent)
+	// Load the HTML document
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
+	if err != nil {
+		log.Fatal(err)
+	}
+	//fmt.Printf(dy.Url)
+
+	dy.Type = []string{strings.TrimSpace(doc.Find(".post-meta span").Eq(0).Find("a").Text())}
+	dy.ProductionDate = strings.TrimSpace(doc.Find(".pubtime").Text())
+	dy.Pic, _ = doc.Find(".pic img").Attr("src")
+	dy.Title = strings.TrimSpace(doc.Find(".text span").Eq(0).Text())
+
+	alias := strings.TrimSpace(doc.Find(".text span").Eq(1).Text())
+	dy.Alias = strings.Split(alias, "/")
+
+	dy.Rating = strings.TrimSpace(doc.Find(".rating_num ").Text())
+	dy.DoubanUrl, _ = doc.Find(".rating_num a").Attr("href")
+	dy.DoubanId, _ = doc.Find(".rating_num").Attr("subject")
+
+	star := []string{}
+	doc.Find(".text .attrs span").Each(func(i int, s *goquery.Selection) {
+		star = append(star, strings.TrimSpace(s.Find("a").Text()))
+	})
+	dy.Stars = star
+
+	dirct := []string{}
+	doc.Find(".director .attrs span").Each(func(i int, s *goquery.Selection) {
+		dirct = append(dirct, strings.TrimSpace(s.Find("a").Text()))
+	})
+	dy.Director = dirct
+
+	dy.Area = strings.TrimSpace(doc.Find(".text p").Eq(3).Find("span").Text())
+	dy.Year = strings.TrimSpace(doc.Find(".text p").Eq(4).Find("span").Text())
+	dy.Language = strings.TrimSpace(doc.Find(".text p").Eq(5).Find("span").Text())
+	dy.RunTime = strings.TrimSpace(doc.Find(".text p").Eq(6).Find("span").Text())
+
+	tags := []string{}
+
+	doc.Find(".text .tag a").Each(func(i int, s *goquery.Selection) {
+		tags = append(tags, strings.TrimSpace(s.Text()))
+	})
+	dy.Tags = tags
+
+	dy.Introduction = strings.TrimSpace(doc.Find(".article-related p").Text())
+
+	down_Urls := []DownStruct{}
+	doc.Find(".url-left").Each(func(i int, s *goquery.Selection) {
+		t, _ := s.Find(".url-left a").Attr("title")
+		h, _ := s.Find(".url-left a").Attr("href")
+		reg, _ := regexp.Compile(`.*:`)
+		n_type := reg.FindString(h)
+
+		down_Urls = append(down_Urls, DownStruct{t, h, n_type})
+	})
+
+	dy.DownUrl = down_Urls
+	return *dy
 }
 
 // 下载地址单独保存
@@ -208,6 +280,11 @@ func GetContent(dy *Dy) Dy {
 	dy.ProductionDate = strings.TrimSpace(doc.Find(".pubtime").Text())
 	dy.Pic, _ = doc.Find(".pic img").Attr("src")
 	dy.Title = strings.TrimSpace(doc.Find(".text span").Eq(0).Text())
+	dy.Rating = strings.TrimSpace(doc.Find(".rating_num ").Text())
+	dy.DoubanId, _ = doc.Find(".rating_num").Attr("subject")
+
+	alias := strings.TrimSpace(doc.Find(".text span").Eq(1).Text())
+	dy.Alias = strings.Split(alias, "/")
 
 	star := []string{}
 	doc.Find(".text .attrs span").Each(func(i int, s *goquery.Selection) {
@@ -225,10 +302,8 @@ func GetContent(dy *Dy) Dy {
 	dy.Year = strings.TrimSpace(doc.Find(".text p").Eq(4).Find("span").Text())
 	dy.Language = strings.TrimSpace(doc.Find(".text p").Eq(5).Find("span").Text())
 	dy.RunTime = strings.TrimSpace(doc.Find(".text p").Eq(6).Find("span").Text())
-	dy.RunTime = strings.TrimSpace(doc.Find(".text p").Eq(6).Find("span").Text())
 
 	tags := []string{}
-
 	doc.Find(".text .tag a").Each(func(i int, s *goquery.Selection) {
 		tags = append(tags, strings.TrimSpace(s.Text()))
 	})
@@ -238,8 +313,8 @@ func GetContent(dy *Dy) Dy {
 	return *dy
 }
 
-func GetContentNew(url string) []DownStruct {
-	htmlContent, _ := GetHttpHtmlContent(url, "#download1", "document.querySelector(\"body\")")
+func GetDwonUrlAndDoubanUrl(dy *Dy) Dy {
+	htmlContent, _ := GetHttpHtmlContent(dy.Url, "#download1", "document.querySelector(\"body\")")
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
 	if err != nil {
@@ -255,13 +330,17 @@ func GetContentNew(url string) []DownStruct {
 
 		down_Urls = append(down_Urls, DownStruct{t, h, n_type})
 	})
-	return down_Urls
+	dy.DownUrl = down_Urls
+
+	dy.DoubanId, _ = doc.Find(".rating_num").Attr("subject")
+
+	return *dy
 }
 
 //获取网站上爬取的数据
 func GetHttpHtmlContent(url string, selector string, sel interface{}) (string, error) {
 	options := []chromedp.ExecAllocatorOption{
-		chromedp.Flag("headless", true), // debug使用
+		chromedp.Flag("headless", false), // debug使用
 		chromedp.Flag("blink-settings", "imagesEnabled=false"),
 		chromedp.UserAgent(`Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36`),
 	}
