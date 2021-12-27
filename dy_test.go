@@ -18,3 +18,11 @@ func TestGetContentNew(t *testing.T) {
 	ss := GetDwonUrlAndDoubanUrl(dy)
 	t.Log(ss)
 }
+
+func TestGetContentNewAll(t *testing.T) {
+	dy := &Dy{}
+	dy.Url = "https://www.domp4.cc//html/ReoDhDBBBBBD.html"
+	ss := GetContentNewAll(dy)
+	t.Log(ss)
+
+}

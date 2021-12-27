@@ -24,40 +24,6 @@ type Default struct {
 	ID primitive.ObjectID `bson:"_id" json:"id,omitempty"`
 }
 
-func IsBookOk(url string) string {
-	//panic(2)
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found")
-	}
-	uri := os.Getenv("MONGODB_URI")
-	if uri == "" {
-		log.Fatal("You must set your 'MONGODB_URI' environmental variable. See\n\t https://docs.mongodb.com/drivers/go/current/usage-examples/#environment-variable")
-	}
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
-	if err != nil {
-		log.Fatal(err)
-
-	}
-
-	defer func() {
-		if err := client.Disconnect(context.TODO()); err != nil {
-			panic(err)
-		}
-	}()
-
-	coll := client.Database("dzs").Collection("book")
-	var result Default
-	err = coll.FindOne(context.TODO(), bson.D{{"url", url}}).Decode(&result)
-	if err == mongo.ErrNoDocuments {
-		return ""
-	}
-	if err != nil {
-		panic(err)
-	}
-
-	return result.ID.Hex()
-}
-
 func IsDyListOk(url string) string {
 	//panic(2)
 	if err := godotenv.Load(); err != nil {
@@ -98,6 +64,7 @@ type DownStruct struct {
 	Type  string
 }
 type Dy struct {
+	Url               string
 	CId               string `bson:"c_id"`
 	RId               string `bson:"r_id"`
 	Title             string
@@ -119,7 +86,6 @@ type Dy struct {
 	DoubanId          string `bson:"douban_id"`
 	Tags              []string
 	Type              []string
-	Url               string
 	Year              string
 	Area              string
 	RunTime           string `bson:"run_time"`
@@ -184,20 +150,21 @@ func main() {
 	for {
 		select {
 		case dy := <-ch:
-			dys := GetContent(&dy)
-			dy_info := GetDwonUrlAndDoubanUrl(&dys)
+			//dys := GetContent(&dy)
+			//dy_info := GetDwonUrlAndDoubanUrl(&dys)
+			dy_info := GetContentNewAll(&dy)
 			SaveDy(&dy_info)
 			break
 		default:
+			os.Exit(1)
 			fmt.Printf("no communication\n")
-
+			break
 		}
 	}
 }
 
 func GetContentNewAll(dy *Dy) Dy {
 	htmlContent, _ := GetHttpHtmlContent(dy.Url, "#download1", "document.querySelector(\"body\")")
-	fmt.Println(htmlContent)
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
 	if err != nil {
@@ -211,7 +178,11 @@ func GetContentNewAll(dy *Dy) Dy {
 	dy.Title = strings.TrimSpace(doc.Find(".text span").Eq(0).Text())
 
 	alias := strings.TrimSpace(doc.Find(".text span").Eq(1).Text())
-	dy.Alias = strings.Split(alias, "/")
+	re_alias := strings.Split(alias, "/")
+	for k, v := range re_alias {
+		re_alias[k] = strings.TrimSpace(v)
+	}
+	dy.Alias = re_alias
 
 	dy.Rating = strings.TrimSpace(doc.Find(".rating_num ").Text())
 	dy.DoubanUrl, _ = doc.Find(".rating_num a").Attr("href")
@@ -229,13 +200,12 @@ func GetContentNewAll(dy *Dy) Dy {
 	})
 	dy.Director = dirct
 
-	dy.Area = strings.TrimSpace(doc.Find(".text p").Eq(3).Find("span").Text())
-	dy.Year = strings.TrimSpace(doc.Find(".text p").Eq(4).Find("span").Text())
-	dy.Language = strings.TrimSpace(doc.Find(".text p").Eq(5).Find("span").Text())
-	dy.RunTime = strings.TrimSpace(doc.Find(".text p").Eq(6).Find("span").Text())
+	dy.Area = strings.TrimSpace(doc.Find(".director").Next().Find("span").Text())
+	dy.Year = strings.TrimSpace(doc.Find(".director").Next().Next().Find("span").Text())
+	dy.Language = strings.TrimSpace(doc.Find(".director").Next().Next().Next().Find("span").Text())
+	dy.RunTime = strings.TrimSpace(doc.Find(".director").Next().Next().Next().Next().Find("span").Text())
 
 	tags := []string{}
-
 	doc.Find(".text .tag a").Each(func(i int, s *goquery.Selection) {
 		tags = append(tags, strings.TrimSpace(s.Text()))
 	})
@@ -247,10 +217,8 @@ func GetContentNewAll(dy *Dy) Dy {
 	doc.Find(".url-left").Each(func(i int, s *goquery.Selection) {
 		t, _ := s.Find(".url-left a").Attr("title")
 		h, _ := s.Find(".url-left a").Attr("href")
-		reg, _ := regexp.Compile(`.*:`)
-		n_type := reg.FindString(h)
-
-		down_Urls = append(down_Urls, DownStruct{t, h, n_type})
+		reg, _ := regexp.Compile(`[^:]+`)
+		down_Urls = append(down_Urls, DownStruct{t, h, reg.FindString(h)})
 	})
 
 	dy.DownUrl = down_Urls
@@ -283,7 +251,11 @@ func GetContent(dy *Dy) Dy {
 	dy.DoubanId, _ = doc.Find(".rating_num").Attr("subject")
 
 	alias := strings.TrimSpace(doc.Find(".text span").Eq(1).Text())
-	dy.Alias = strings.Split(alias, "/")
+	re_alias := strings.Split(alias, "/")
+	for k, v := range re_alias {
+		re_alias[k] = strings.TrimSpace(v)
+	}
+	dy.Alias = re_alias
 
 	star := []string{}
 	doc.Find(".text .attrs span").Each(func(i int, s *goquery.Selection) {
@@ -325,7 +297,6 @@ func GetDwonUrlAndDoubanUrl(dy *Dy) Dy {
 		t, _ := s.Find(".url-left a").Attr("title")
 		h, _ := s.Find(".url-left a").Attr("href")
 		reg, _ := regexp.Compile(`[^:]+`)
-
 		down_Urls = append(down_Urls, DownStruct{t, h, reg.FindString(h)})
 	})
 	dy.DownUrl = down_Urls
