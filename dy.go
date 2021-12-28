@@ -20,6 +20,7 @@ import (
 )
 
 var domin = "https://www.domp4.cc/"
+var wg sync.WaitGroup
 
 type Default struct {
 	ID primitive.ObjectID `bson:"_id" json:"id,omitempty"`
@@ -98,32 +99,87 @@ type Dy struct {
 	DownCount         int `bson:"down_count"`
 }
 
-func GetFetchUrl(url_list []string) {
-	for _, v := range url_list {
-		fmt.Println(v)
-		go CrawUrl(v)
-
-	}
-}
-
-func CrawUrl(url string) {
-	list := []string{}
+func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
+	defer wg.Done()
 	i := 1
 	for {
-		craw_url := fmt.Sprintf(url, i)
-		list = append(list, craw_url)
-		i++
-		if i == 20 {
+		url := fmt.Sprintf(crawl_url, i)
+		fmt.Println(url)
+		dy := &Dy{}
+		dy.UpdateTime = time.Now()
+
+		res, err := http.Get(url)
+		if err != nil {
+			log.Fatal(err)
+		}
+		res.Close = true
+		res.Header.Add("Connection", "close")
+		defer res.Body.Close()
+		if res.StatusCode != 200 {
+			log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+		}
+		doc, err := goquery.NewDocumentFromReader(res.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		doc.Find("#list_dy ul li").Each(func(i int, s *goquery.Selection) {
+			hrefs, _ := s.Find("a").Attr("href")
+			dy.LongTitle = strings.TrimSpace(s.Find("a").Text())
+			dy.PageDate = strings.TrimSpace(s.Find("span").Text())
+			dy.Url = domin + strings.TrimSpace(hrefs)
+			dy.DownStatus = 0
+			Regexp := regexp.MustCompile(`([^/]*?)\.html`)
+			params := Regexp.FindStringSubmatch(dy.Url)
+
+			dy.CId = params[1]
+			if dy.Url == "" {
+				fmt.Println("不存在url", dy)
+				return
+			}
+
+			if IsDyListOk(dy.Url) != "" {
+				fmt.Println("已保存数据", dy.LongTitle)
+				return
+			} else {
+				fmt.Println("开始抓取", dy.LongTitle)
+			}
+			CrwaInfo(dy)
+		})
+
+		_, ok := doc.Find(".pagination li").Eq(5).Find("a").Attr("href")
+		if ok != true {
+			fmt.Println(crawl_url, "抓取完成")
 			break
 		}
-		fmt.Println(craw_url)
+		i++
+
 	}
 }
 
 func main() {
-	var wg sync.WaitGroup
+	wg.Add(10)
+	list := []string{
+		"https: //www.domp4.cc/list/1-%v.html",
+		"https: //www.domp4.cc/list/2-%v.html",
+		"https: //www.domp4.cc/list/3-%v.html",
+		"https: //www.domp4.cc/list/4-%v.html",
+		"https: //www.domp4.cc/list/5-%v.html",
+		"https: //www.domp4.cc/list/6-%v.html",
+		"https: //www.domp4.cc/list/7-%v.html",
+		"https: //www.domp4.cc/list/8-%v.html",
+		"https: //www.domp4.cc/list/9-%v.html",
+		"https: //www.domp4.cc/list/10-%v.html",
+	}
+	for _, v := range list {
 
-	wg.Add(1)
+		go GetFetchUrl(v, &wg)
+
+	}
+	wg.Wait()
+	fmt.Println("抓取结束", time.Time{})
+}
+func ss() {
 
 	url := "https://www.domp4.cc/list/99-1.html"
 	dy := &Dy{}
@@ -165,15 +221,9 @@ func main() {
 		} else {
 			fmt.Println("开始抓取", dy.LongTitle)
 		}
-		//wg.Add(1)
-		//go DoCraw(dy, &wg)
-		//go DoCraw(dy, &wg)
 		CrwaInfo(dy)
-
 	})
-
-	//wg.Wait()
-	//fmt.Println("执行完成")
+	fmt.Println("执行完成", dy.LongTitle)
 }
 
 func DoCraw(dy *Dy, wg *sync.WaitGroup) {
@@ -348,7 +398,7 @@ func GetHttpHtmlContent(url string, selector string, sel interface{}) (string, e
 	chromedp.Run(chromeCtx, make([]chromedp.Action, 0, 1)...)
 
 	//创建一个上下文，超时时间为40s
-	timeoutCtx, cancel := context.WithTimeout(chromeCtx, 40*time.Second)
+	timeoutCtx, cancel := context.WithTimeout(chromeCtx, 2*time.Minute)
 	defer cancel()
 
 	var htmlContent string
