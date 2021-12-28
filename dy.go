@@ -21,8 +21,6 @@ import (
 
 var domin = "https://www.domp4.cc/"
 
-var wg sync.WaitGroup
-
 type Default struct {
 	ID primitive.ObjectID `bson:"_id" json:"id,omitempty"`
 }
@@ -123,6 +121,8 @@ func CrawUrl(url string) {
 }
 
 func main() {
+	var wg sync.WaitGroup
+
 	wg.Add(1)
 
 	url := "https://www.domp4.cc/list/99-1.html"
@@ -165,13 +165,13 @@ func main() {
 		} else {
 			fmt.Println("开始抓取", dy.LongTitle)
 		}
-
+		wg.Add(1)
 		go DoCraw(dy, &wg)
 
 	})
 
 	wg.Wait()
-	fmt.Println("执行完成")
+	//fmt.Println("执行完成")
 }
 
 func DoCraw(dy *Dy, wg *sync.WaitGroup) {
