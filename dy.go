@@ -2,17 +2,12 @@ package main
 
 import (
 	"context"
+	mongo_orm "crwal/mongo.orm"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/chromedp/chromedp"
-	"github.com/joho/godotenv"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"net/http"
-	"os"
 	"regexp"
 	"strings"
 	"sync"
@@ -22,90 +17,13 @@ import (
 var domin = "https://www.domp4.cc/"
 var wg sync.WaitGroup
 
-type Default struct {
-	ID primitive.ObjectID `bson:"_id" json:"id,omitempty"`
-}
-
-func IsDyListOk(url string) string {
-	//panic(2)
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found")
-	}
-	uri := os.Getenv("MONGODB_URI")
-	if uri == "" {
-		log.Fatal("You must set your 'MONGODB_URI' environmental variable. See\n\t https://docs.mongodb.com/drivers/go/current/usage-examples/#environment-variable")
-	}
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
-	if err != nil {
-		log.Fatal(err)
-
-	}
-
-	defer func() {
-		if err := client.Disconnect(context.TODO()); err != nil {
-			panic(err)
-		}
-	}()
-
-	coll := client.Database("dy").Collection("list")
-	var result Default
-	err = coll.FindOne(context.TODO(), bson.D{{"url", url}}).Decode(&result)
-	if err == mongo.ErrNoDocuments {
-		return ""
-	}
-	if err != nil {
-		panic(err)
-	}
-
-	return result.ID.Hex()
-}
-
-type DownStruct struct {
-	Title string
-	Url   string
-	Type  string
-}
-type Dy struct {
-	Url               string
-	CId               string `bson:"c_id"`
-	RId               string `bson:"r_id"`
-	Title             string
-	Alias             []string
-	LongTitle         string `bson:"long_title"`
-	Pic               string
-	Director          []string
-	Stars             []string
-	Introduction      string
-	DownStatus        int
-	LastUpdated       string `bson:"last_updated"`
-	UpdatedDate       string `bson:"updated_date"`
-	Source            string
-	UpdateTime        time.Time `bson:"update_time"`
-	ProductionDate    string    `bson:"production_date"`
-	PageDate          string    `bson:"page_date"`
-	Rating            string
-	DoubanUrl         string `bson:"douban_url"`
-	DoubanId          string `bson:"douban_id"`
-	Tags              []string
-	Type              []string
-	Year              string
-	Area              string
-	RunTime           string `bson:"run_time"`
-	Language          string
-	DownUrl           []DownStruct `bson:"down_url"`
-	ProductionCompany string       `bson:"production_company"`
-	Status            string
-	ClickCount        int `bson:"click_count"`
-	DownCount         int `bson:"down_count"`
-}
-
 func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	i := 1
 	for {
 		url := fmt.Sprintf(crawl_url, i)
 		fmt.Println(url)
-		dy := &Dy{}
+		dy := &mongo_orm.Dy{}
 		dy.UpdateTime = time.Now()
 
 		res, err := http.Get(url)
@@ -139,7 +57,7 @@ func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
 				return
 			}
 
-			if IsDyListOk(dy.Url) != "" {
+			if mongo_orm.IsDyListOk(dy.Url) != "" {
 				fmt.Println("已保存数据", dy.LongTitle)
 				return
 			} else {
@@ -180,10 +98,10 @@ func main() {
 	wg.Wait()
 	fmt.Println("抓取结束", time.Time{})
 }
-func ss() {
+func S() {
 
 	url := "https://www.domp4.cc/list/99-1.html"
-	dy := &Dy{}
+	dy := &mongo_orm.Dy{}
 	dy.UpdateTime = time.Now()
 
 	res, err := http.Get(url)
@@ -216,7 +134,7 @@ func ss() {
 			return
 		}
 
-		if IsDyListOk(dy.Url) != "" {
+		if mongo_orm.IsDyListOk(dy.Url) != "" {
 			fmt.Println("已保存数据", dy.LongTitle)
 			return
 		} else {
@@ -227,18 +145,12 @@ func ss() {
 	fmt.Println("执行完成", dy.LongTitle)
 }
 
-func DoCraw(dy *Dy, wg *sync.WaitGroup) {
-	defer wg.Done()
+func CrwaInfo(dy *mongo_orm.Dy) {
 	dy_info := GetContentNewAll(dy)
-	SaveDy(&dy_info)
+	mongo_orm.SaveDy(&dy_info)
 }
 
-func CrwaInfo(dy *Dy) {
-	dy_info := GetContentNewAll(dy)
-	SaveDy(&dy_info)
-}
-
-func GetContentNewAll(dy *Dy) Dy {
+func GetContentNewAll(dy *mongo_orm.Dy) mongo_orm.Dy {
 	htmlContent, _ := GetHttpHtmlContent(dy.Url, "#download1", "document.querySelector(\"body\")")
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
@@ -288,12 +200,12 @@ func GetContentNewAll(dy *Dy) Dy {
 
 	dy.Introduction = strings.TrimSpace(doc.Find(".article-related p").Text())
 
-	down_Urls := []DownStruct{}
+	down_Urls := []mongo_orm.DownStruct{}
 	doc.Find(".url-left").Each(func(i int, s *goquery.Selection) {
 		t, _ := s.Find(".url-left a").Attr("title")
 		h, _ := s.Find(".url-left a").Attr("href")
 		reg, _ := regexp.Compile(`[^:]+`)
-		down_Urls = append(down_Urls, DownStruct{t, h, reg.FindString(h)})
+		down_Urls = append(down_Urls, mongo_orm.DownStruct{t, h, reg.FindString(h)})
 	})
 
 	dy.DownUrl = down_Urls
@@ -301,7 +213,7 @@ func GetContentNewAll(dy *Dy) Dy {
 }
 
 // 下载地址单独保存
-func GetContent(dy *Dy) Dy {
+func GetContent(dy *mongo_orm.Dy) mongo_orm.Dy {
 	res, err := http.Get(dy.Url)
 	if err != nil {
 		log.Fatal(err)
@@ -359,7 +271,7 @@ func GetContent(dy *Dy) Dy {
 	return *dy
 }
 
-func GetDwonUrlAndDoubanUrl(dy *Dy) Dy {
+func GetDwonUrlAndDoubanUrl(dy *mongo_orm.Dy) mongo_orm.Dy {
 	htmlContent, _ := GetHttpHtmlContent(dy.Url, "#download1", "document.querySelector(\"body\")")
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
@@ -367,12 +279,12 @@ func GetDwonUrlAndDoubanUrl(dy *Dy) Dy {
 		log.Fatal(err)
 	}
 	//fmt.Printf(dy.Url)
-	down_Urls := []DownStruct{}
+	down_Urls := []mongo_orm.DownStruct{}
 	doc.Find(".url-left").Each(func(i int, s *goquery.Selection) {
 		t, _ := s.Find(".url-left a").Attr("title")
 		h, _ := s.Find(".url-left a").Attr("href")
 		reg, _ := regexp.Compile(`[^:]+`)
-		down_Urls = append(down_Urls, DownStruct{t, h, reg.FindString(h)})
+		down_Urls = append(down_Urls, mongo_orm.DownStruct{t, h, reg.FindString(h)})
 	})
 	dy.DownUrl = down_Urls
 
@@ -415,47 +327,4 @@ func GetHttpHtmlContent(url string, selector string, sel interface{}) (string, e
 	//log.Println(htmlContent)
 
 	return htmlContent, nil
-}
-
-func SaveDy(dy *Dy) string {
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found")
-	}
-	uri := os.Getenv("MONGODB_URI")
-	if uri == "" {
-		log.Fatal("You must set your 'MONGODB_URI' environmental variable. See\n\t https://docs.mongodb.com/drivers/go/current/usage-examples/#environment-variable")
-	}
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer func() {
-		if err := client.Disconnect(context.TODO()); err != nil {
-			panic(err)
-		}
-	}()
-
-	coll := client.Database("dy").Collection("list")
-	var result bson.M
-	err = coll.FindOne(context.TODO(), bson.D{{"url", dy.Url}}).Decode(&result)
-	if err == mongo.ErrNoDocuments {
-		fmt.Printf("No document was found with the name %s\n", dy.LongTitle)
-
-		result, err := coll.InsertOne(context.TODO(), dy)
-
-		if err != nil {
-			panic(err)
-		}
-		fmt.Printf("Inserted document with _id: %v\n", result.InsertedID)
-		if oid, ok := result.InsertedID.(primitive.ObjectID); ok {
-			return oid.String()
-		} else {
-			return ""
-		}
-	}
-	if err != nil {
-		panic(err)
-	}
-	return ""
 }
