@@ -149,7 +149,7 @@ func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
 		})
 
 		_, ok := doc.Find(".pagination li").Eq(5).Find("a").Attr("href")
-		if ok != true {
+		if ok == false {
 			fmt.Println(crawl_url, "抓取完成")
 			break
 		}
