@@ -75,29 +75,6 @@ func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
 
 	}
 }
-
-func main() {
-	wg.Add(10)
-	list := []string{
-		"https://www.domp4.cc/list/1-%v.html",
-		"https://www.domp4.cc/list/2-%v.html",
-		"https://www.domp4.cc/list/3-%v.html",
-		"https://www.domp4.cc/list/4-%v.html",
-		"https://www.domp4.cc/list/5-%v.html",
-		"https://www.domp4.cc/list/6-%v.html",
-		"https://www.domp4.cc/list/7-%v.html",
-		"https://www.domp4.cc/list/8-%v.html",
-		"https://www.domp4.cc/list/9-%v.html",
-		"https://www.domp4.cc/list/10-%v.html",
-	}
-
-	for _, v := range list {
-		go GetFetchUrl(v, &wg)
-	}
-
-	wg.Wait()
-	fmt.Println("抓取结束", time.Time{})
-}
 func GetHotList() {
 	url := "https://www.domp4.cc/list/99-1.html"
 	dy := &mongo_orm.Dy{}
@@ -326,4 +303,29 @@ func GetHttpHtmlContent(url string, selector string, sel interface{}) (string, e
 	//log.Println(htmlContent)
 
 	return htmlContent, nil
+}
+
+func main() {
+
+	mongo_orm.MInit()
+	wg.Add(10)
+	list := []string{
+		"https://www.domp4.cc/list/1-%v.html",
+		"https://www.domp4.cc/list/2-%v.html",
+		"https://www.domp4.cc/list/3-%v.html",
+		"https://www.domp4.cc/list/4-%v.html",
+		"https://www.domp4.cc/list/5-%v.html",
+		"https://www.domp4.cc/list/6-%v.html",
+		"https://www.domp4.cc/list/7-%v.html",
+		"https://www.domp4.cc/list/8-%v.html",
+		"https://www.domp4.cc/list/9-%v.html",
+		"https://www.domp4.cc/list/10-%v.html",
+	}
+
+	for _, v := range list {
+		go GetFetchUrl(v, &wg)
+	}
+
+	wg.Wait()
+	fmt.Println("抓取结束", time.Time{})
 }
