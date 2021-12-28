@@ -123,10 +123,11 @@ func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
 			log.Fatal(err)
 		}
 
-		doc.Find("#list_dy ul li").Each(func(i int, s *goquery.Selection) {
-			hrefs, _ := s.Find("a").Attr("href")
-			dy.LongTitle = strings.TrimSpace(s.Find("a").Text())
-			dy.PageDate = strings.TrimSpace(s.Find("span").Text())
+		fmt.Println("开始抓取详情数据：", url)
+		doc.Find("#list_all ul li").Each(func(i int, s *goquery.Selection) {
+			hrefs, _ := s.Find(".text_info h2 a").Attr("href")
+			dy.LongTitle = strings.TrimSpace(s.Find(".text_info h2 a").Text())
+			dy.PageDate = strings.TrimSpace(s.Find(".text_info .update_time").Text())
 			dy.Url = domin + strings.TrimSpace(hrefs)
 			dy.DownStatus = 0
 			Regexp := regexp.MustCompile(`([^/]*?)\.html`)
@@ -159,18 +160,20 @@ func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
 
 func main() {
 	wg.Add(10)
-	list := []string{
-		"https://www.domp4.cc/list/1-%v.html",
-		"https://www.domp4.cc/list/2-%v.html",
-		"https://www.domp4.cc/list/3-%v.html",
-		"https://www.domp4.cc/list/4-%v.html",
-		"https://www.domp4.cc/list/5-%v.html",
-		"https://www.domp4.cc/list/6-%v.html",
-		"https://www.domp4.cc/list/7-%v.html",
-		"https://www.domp4.cc/list/8-%v.html",
-		"https://www.domp4.cc/list/9-%v.html",
-		"https://www.domp4.cc/list/10-%v.html",
-	}
+	//list := []string{
+	//	"https://www.domp4.cc/list/1-%v.html",
+	//	"https://www.domp4.cc/list/2-%v.html",
+	//	"https://www.domp4.cc/list/3-%v.html",
+	//	"https://www.domp4.cc/list/4-%v.html",
+	//	"https://www.domp4.cc/list/5-%v.html",
+	//	"https://www.domp4.cc/list/6-%v.html",
+	//	"https://www.domp4.cc/list/7-%v.html",
+	//	"https://www.domp4.cc/list/8-%v.html",
+	//	"https://www.domp4.cc/list/9-%v.html",
+	//	"https://www.domp4.cc/list/10-%v.html",
+	//}
+
+	list := []string{"https://www.domp4.cc/list/1-%v.html"}
 	for _, v := range list {
 
 		go GetFetchUrl(v, &wg)
