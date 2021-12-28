@@ -124,6 +124,7 @@ func CrawUrl(url string) {
 
 func main() {
 	wg.Add(20)
+
 	url := "https://www.domp4.cc/list/99-1.html"
 	dy := &Dy{}
 	dy.UpdateTime = time.Now()
@@ -165,7 +166,7 @@ func main() {
 			fmt.Println("开始抓取", dy.LongTitle)
 		}
 
-		go DoCraw(dy, wg)
+		go DoCraw(dy, &wg)
 
 	})
 
@@ -173,7 +174,7 @@ func main() {
 	fmt.Println("执行完成")
 }
 
-func DoCraw(dy *Dy, wg sync.WaitGroup) {
+func DoCraw(dy *Dy, wg *sync.WaitGroup) {
 	defer wg.Done()
 	dy_info := GetContentNewAll(dy)
 	SaveDy(&dy_info)
@@ -381,7 +382,7 @@ func SaveDy(dy *Dy) string {
 	var result bson.M
 	err = coll.FindOne(context.TODO(), bson.D{{"url", dy.Url}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
-		fmt.Printf("No document was found with the name %s\n", dy.Title)
+		fmt.Printf("No document was found with the name %s\n", dy.LongTitle)
 
 		result, err := coll.InsertOne(context.TODO(), dy)
 
