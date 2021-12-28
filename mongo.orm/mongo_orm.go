@@ -71,16 +71,15 @@ func MInit() {
 		log.Fatal(err)
 
 	}
-
 	defer func() {
 		if err := MClient.Disconnect(context.TODO()); err != nil {
 			panic(err)
 		}
 	}()
+
 }
 
 func IsDyListOk(url string) string {
-
 	coll := MClient.Database("dy").Collection("list")
 	var result Default
 	err := coll.FindOne(context.TODO(), bson.D{{"url", url}}).Decode(&result)
@@ -95,27 +94,10 @@ func IsDyListOk(url string) string {
 }
 
 func SaveDy(dy *Dy) string {
-	if err := godotenv.Load(); err != nil {
-		log.Println("No .env file found")
-	}
-	uri := os.Getenv("MONGODB_URI")
-	if uri == "" {
-		log.Fatal("You must set your 'MONGODB_URI' environmental variable. See\n\t https://docs.mongodb.com/drivers/go/current/usage-examples/#environment-variable")
-	}
-	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
-	if err != nil {
-		log.Fatal(err)
-	}
 
-	defer func() {
-		if err := client.Disconnect(context.TODO()); err != nil {
-			panic(err)
-		}
-	}()
-
-	coll := client.Database("dy").Collection("list")
+	coll := MClient.Database("dy").Collection("list")
 	var result bson.M
-	err = coll.FindOne(context.TODO(), bson.D{{"url", dy.Url}}).Decode(&result)
+	err := coll.FindOne(context.TODO(), bson.D{{"url", dy.Url}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
 		fmt.Printf("No document was found with the name %s\n", dy.LongTitle)
 

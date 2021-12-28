@@ -306,7 +306,6 @@ func GetHttpHtmlContent(url string, selector string, sel interface{}) (string, e
 }
 
 func main() {
-
 	mongo_orm.MInit()
 	wg.Add(10)
 	list := []string{
