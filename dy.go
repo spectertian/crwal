@@ -98,8 +98,7 @@ func main() {
 	wg.Wait()
 	fmt.Println("抓取结束", time.Time{})
 }
-func S() {
-
+func GetHotList() {
 	url := "https://www.domp4.cc/list/99-1.html"
 	dy := &mongo_orm.Dy{}
 	dy.UpdateTime = time.Now()
