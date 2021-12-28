@@ -15,10 +15,13 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 )
 
 var domin = "https://www.domp4.cc/"
+
+var wg sync.WaitGroup
 
 type Default struct {
 	ID primitive.ObjectID `bson:"_id" json:"id,omitempty"`
@@ -97,36 +100,30 @@ type Dy struct {
 	DownCount         int `bson:"down_count"`
 }
 
-func ClickPages(url string) {
-	// create chrome instance
-	ctx, cancel := chromedp.NewContext(
-		context.Background(),
-		chromedp.WithDebugf(log.Printf),
-	)
-	defer cancel()
+func GetFetchUrl(url_list []string) {
+	for _, v := range url_list {
+		fmt.Println(v)
+		go CrawUrl(v)
 
-	// create a timeout
-	ctx, cancel = context.WithTimeout(ctx, 15*time.Second)
-	defer cancel()
-
-	// navigate to a page, wait for an element, click
-	var example string
-	err := chromedp.Run(ctx,
-		chromedp.Navigate(url),
-		// wait for footer element is visible (ie, page is loaded)
-		chromedp.WaitVisible(`body > pagination`),
-		// find and click "Example" link
-		chromedp.Click(`pagination/li[5]`, chromedp.NodeVisible),
-		// retrieve the text of the textarea
-		chromedp.Value(`#example-After textarea`, &example),
-	)
-	if err != nil {
-		log.Fatal(err)
 	}
-	log.Printf("Go's time.After example:\n%s", example)
+}
+
+func CrawUrl(url string) {
+	list := []string{}
+	i := 1
+	for {
+		craw_url := fmt.Sprintf(url, i)
+		list = append(list, craw_url)
+		i++
+		if i == 20 {
+			break
+		}
+		fmt.Println(craw_url)
+	}
 }
 
 func main() {
+	wg.Add(20)
 	url := "https://www.domp4.cc/list/99-1.html"
 	dy := &Dy{}
 	dy.UpdateTime = time.Now()
@@ -145,7 +142,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	ch := make(chan Dy, 100)
 
 	doc.Find("#list_dy ul li").Each(func(i int, s *goquery.Selection) {
 		hrefs, _ := s.Find("a").Attr("href")
@@ -169,27 +165,18 @@ func main() {
 			fmt.Println("开始抓取", dy.LongTitle)
 		}
 
-		go func() {
-			ch <- *dy
-		}()
+		go DoCraw(dy, wg)
 
 	})
 
-	//close(ch)
-	for {
-		select {
-		case dy := <-ch:
-			//dys := GetContent(&dy)
-			//dy_info := GetDwonUrlAndDoubanUrl(&dys)
-			dy_info := GetContentNewAll(&dy)
-			SaveDy(&dy_info)
-			break
-		default:
-			os.Exit(1)
-			fmt.Printf("no communication\n")
-			break
-		}
-	}
+	wg.Wait()
+	fmt.Println("执行完成")
+}
+
+func DoCraw(dy *Dy, wg sync.WaitGroup) {
+	defer wg.Done()
+	dy_info := GetContentNewAll(dy)
+	SaveDy(&dy_info)
 }
 
 func GetContentNewAll(dy *Dy) Dy {
