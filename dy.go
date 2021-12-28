@@ -123,7 +123,7 @@ func CrawUrl(url string) {
 }
 
 func main() {
-	wg.Add(20)
+	wg.Add(5)
 
 	url := "https://www.domp4.cc/list/99-1.html"
 	dy := &Dy{}
