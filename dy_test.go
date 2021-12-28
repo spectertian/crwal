@@ -1,7 +1,7 @@
 package main
 
 import (
-	mongo_orm "crwal/mongo.orm"
+	mongo_orm "crwal/util"
 	"sync"
 	"testing"
 )

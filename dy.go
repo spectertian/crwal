@@ -2,7 +2,8 @@ package main
 
 import (
 	"context"
-	mongo_orm "crwal/mongo.orm"
+	"crwal/db"
+	"crwal/model"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/chromedp/chromedp"
@@ -23,7 +24,7 @@ func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
 	for {
 		url := fmt.Sprintf(crawl_url, i)
 		fmt.Println(url)
-		dy := &mongo_orm.Dy{}
+		dy := &model.Dy{}
 		dy.UpdateTime = time.Now()
 
 		res, err := http.Get(url)
@@ -57,7 +58,7 @@ func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
 				return
 			}
 
-			if mongo_orm.IsDyListOk(dy.Url) != "" {
+			if db.IsDyListOk(dy.Url) != "" {
 				fmt.Println("已保存数据", dy.LongTitle)
 				return
 			} else {
@@ -77,7 +78,7 @@ func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
 }
 func GetHotList() {
 	url := "https://www.domp4.cc/list/99-1.html"
-	dy := &mongo_orm.Dy{}
+	dy := &model.Dy{}
 	dy.UpdateTime = time.Now()
 
 	res, err := http.Get(url)
@@ -110,7 +111,7 @@ func GetHotList() {
 			return
 		}
 
-		if mongo_orm.IsDyListOk(dy.Url) != "" {
+		if db.IsDyListOk(dy.Url) != "" {
 			fmt.Println("已保存数据", dy.LongTitle)
 			return
 		} else {
@@ -121,12 +122,12 @@ func GetHotList() {
 	fmt.Println("执行完成", dy.LongTitle)
 }
 
-func CrwaInfo(dy *mongo_orm.Dy) {
+func CrwaInfo(dy *model.Dy) {
 	dy_info := GetContentNewAll(dy)
-	mongo_orm.SaveDy(&dy_info)
+	db.SaveDy(&dy_info)
 }
 
-func GetContentNewAll(dy *mongo_orm.Dy) mongo_orm.Dy {
+func GetContentNewAll(dy *model.Dy) model.Dy {
 	htmlContent, _ := GetHttpHtmlContent(dy.Url, "#download1", "document.querySelector(\"body\")")
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
@@ -176,12 +177,12 @@ func GetContentNewAll(dy *mongo_orm.Dy) mongo_orm.Dy {
 
 	dy.Introduction = strings.TrimSpace(doc.Find(".article-related p").Text())
 
-	down_Urls := []mongo_orm.DownStruct{}
+	down_Urls := []model.DownStruct{}
 	doc.Find(".url-left").Each(func(i int, s *goquery.Selection) {
 		t, _ := s.Find(".url-left a").Attr("title")
 		h, _ := s.Find(".url-left a").Attr("href")
 		reg, _ := regexp.Compile(`[^:]+`)
-		down_Urls = append(down_Urls, mongo_orm.DownStruct{t, h, reg.FindString(h)})
+		down_Urls = append(down_Urls, model.DownStruct{t, h, reg.FindString(h)})
 	})
 
 	dy.DownUrl = down_Urls
@@ -189,7 +190,7 @@ func GetContentNewAll(dy *mongo_orm.Dy) mongo_orm.Dy {
 }
 
 // 下载地址单独保存
-func GetContent(dy *mongo_orm.Dy) mongo_orm.Dy {
+func GetContent(dy *model.Dy) model.Dy {
 	res, err := http.Get(dy.Url)
 	if err != nil {
 		log.Fatal(err)
@@ -247,7 +248,7 @@ func GetContent(dy *mongo_orm.Dy) mongo_orm.Dy {
 	return *dy
 }
 
-func GetDwonUrlAndDoubanUrl(dy *mongo_orm.Dy) mongo_orm.Dy {
+func GetDwonUrlAndDoubanUrl(dy *model.Dy) model.Dy {
 	htmlContent, _ := GetHttpHtmlContent(dy.Url, "#download1", "document.querySelector(\"body\")")
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
@@ -255,12 +256,12 @@ func GetDwonUrlAndDoubanUrl(dy *mongo_orm.Dy) mongo_orm.Dy {
 		log.Fatal(err)
 	}
 	//fmt.Printf(dy.Url)
-	down_Urls := []mongo_orm.DownStruct{}
+	down_Urls := []model.DownStruct{}
 	doc.Find(".url-left").Each(func(i int, s *goquery.Selection) {
 		t, _ := s.Find(".url-left a").Attr("title")
 		h, _ := s.Find(".url-left a").Attr("href")
 		reg, _ := regexp.Compile(`[^:]+`)
-		down_Urls = append(down_Urls, mongo_orm.DownStruct{t, h, reg.FindString(h)})
+		down_Urls = append(down_Urls, model.DownStruct{t, h, reg.FindString(h)})
 	})
 	dy.DownUrl = down_Urls
 
@@ -306,7 +307,6 @@ func GetHttpHtmlContent(url string, selector string, sel interface{}) (string, e
 }
 
 func main() {
-	mongo_orm.MInit()
 	wg.Add(10)
 	list := []string{
 		"https://www.domp4.cc/list/1-%v.html",
