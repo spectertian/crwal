@@ -165,17 +165,24 @@ func main() {
 		} else {
 			fmt.Println("开始抓取", dy.LongTitle)
 		}
-		wg.Add(1)
-		go DoCraw(dy, &wg)
+		//wg.Add(1)
+		//go DoCraw(dy, &wg)
+		//go DoCraw(dy, &wg)
+		CrwaInfo(dy)
 
 	})
 
-	wg.Wait()
+	//wg.Wait()
 	//fmt.Println("执行完成")
 }
 
 func DoCraw(dy *Dy, wg *sync.WaitGroup) {
 	defer wg.Done()
+	dy_info := GetContentNewAll(dy)
+	SaveDy(&dy_info)
+}
+
+func CrwaInfo(dy *Dy) {
 	dy_info := GetContentNewAll(dy)
 	SaveDy(&dy_info)
 }
