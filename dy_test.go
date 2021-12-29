@@ -25,12 +25,21 @@ func TestGetContentNew(t *testing.T) {
 }
 
 func TestGetContentNewAll(t *testing.T) {
-	dy := &model.Dy{}
-	dy.Url = "https://www.domp4.cc//html/ReoDhDBBBBBD.html"
-	dy.Url = "https://www.domp4.cc//detail/12589.html"
-	ss := GetContentNewAll(dy)
-	t.Log(ss.Director)
-	t.Log(ss.Stars)
+
+	kk := []string{
+		"https://www.domp4.cc/html/tmtO6gOOOOOg.html",
+		"https://www.domp4.cc//html/X1os0SAAAAAS.html",
+	}
+
+	for _, v := range kk {
+		dy := &model.Dy{}
+		dy.Url = v
+		ss := GetContentNewAll(dy)
+		//t.Log(ss.Director)
+		//t.Log(ss.Stars)
+		t.Log(ss.Title)
+		t.Log(ss.Alias)
+	}
 
 }
 

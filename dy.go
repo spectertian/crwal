@@ -139,14 +139,17 @@ func GetContentNewAll(dy *model.Dy) model.Dy {
 	dy.Type = []string{strings.TrimSpace(doc.Find(".post-meta span").Eq(0).Find("a").Text())}
 	dy.ProductionDate = strings.TrimSpace(doc.Find(".pubtime").Text())
 	dy.Pic, _ = doc.Find(".pic img").Attr("src")
-	dy.Title = strings.TrimSpace(doc.Find(".text span").Eq(0).Text())
+	dy.Title = strings.TrimSpace(doc.Find(".text p").Eq(0).Find("span").Text())
 
-	alias := strings.TrimSpace(doc.Find(".text span").Eq(1).Text())
-	re_alias := strings.Split(alias, "/")
-	for k, v := range re_alias {
-		re_alias[k] = strings.TrimSpace(v)
+	em := doc.Find(".text p").Eq(1).Find("em").Text()
+	if em == "别名：" {
+		alias := strings.TrimSpace(doc.Find(".text p").Eq(1).Find("span").Text())
+		re_alias := strings.Split(alias, "/")
+		for k, v := range re_alias {
+			re_alias[k] = strings.TrimSpace(v)
+		}
+		dy.Alias = re_alias
 	}
-	dy.Alias = re_alias
 
 	dy.Rating = strings.TrimSpace(doc.Find(".rating_num ").Text())
 	dy.DoubanUrl, _ = doc.Find(".rating_num a").Attr("href")
