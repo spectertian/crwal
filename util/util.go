@@ -21,7 +21,8 @@ func MInit() {
 	if uri == "" {
 		log.Fatal("You must set your 'MONGODB_URI' environmental variable. See\n\t https://docs.mongodb.com/drivers/go/current/usage-examples/#environment-variable")
 	}
-	MClient, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+	client_s, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+	MClient = client_s
 	if err != nil {
 		log.Fatal(err)
 

@@ -1,13 +1,16 @@
 package main
 
 import (
-	mongo_orm "crwal/util"
+	"crwal/model"
 	"sync"
 	"testing"
 )
 
+func TestMin(t *testing.T) {
+	main()
+}
 func TestGetContent(t *testing.T) {
-	dy := &mongo_orm.Dy{}
+	dy := &model.Dy{}
 	dy.Url = "https://www.domp4.cc/html/7yt48T44444T.html"
 	//dy.Url = "https://www.domp4.cc//detail/12589.html"
 	ss := GetContent(dy)
@@ -15,14 +18,14 @@ func TestGetContent(t *testing.T) {
 }
 
 func TestGetContentNew(t *testing.T) {
-	dy := &mongo_orm.Dy{}
+	dy := &model.Dy{}
 	dy.Url = "https://www.domp4.cc//html/7yt48T44444T.html"
 	ss := GetDwonUrlAndDoubanUrl(dy)
 	t.Log(ss)
 }
 
 func TestGetContentNewAll(t *testing.T) {
-	dy := &mongo_orm.Dy{}
+	dy := &model.Dy{}
 	dy.Url = "https://www.domp4.cc//html/ReoDhDBBBBBD.html"
 	dy.Url = "https://www.domp4.cc//detail/12589.html"
 	ss := GetContentNewAll(dy)
