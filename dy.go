@@ -310,7 +310,7 @@ func GetHttpHtmlContent(url string, selector string, sel interface{}) (string, e
 }
 
 func main() {
-	wg.Add(1)
+	wg.Add(10)
 	list := []string{
 		"https://www.domp4.cc/list/1-%v.html",
 		"https://www.domp4.cc/list/2-%v.html",
