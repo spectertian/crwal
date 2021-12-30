@@ -286,7 +286,8 @@ func GetHttpHtmlContent(url string, selector string, sel interface{}) (string, e
 	c, _ := chromedp.NewExecAllocator(context.Background(), options...)
 
 	// create context
-	chromeCtx, cancel := chromedp.NewContext(c, chromedp.WithLogf(log.Printf))
+	chromeCtx, cancels := chromedp.NewContext(c, chromedp.WithLogf(log.Printf))
+	defer cancels()
 	// 执行一个空task, 用提前创建Chrome实例
 	chromedp.Run(chromeCtx, make([]chromedp.Action, 0, 1)...)
 
