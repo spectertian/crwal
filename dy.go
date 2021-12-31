@@ -149,13 +149,6 @@ func GetContentNewAll(dy *model.Dy) model.Dy {
 	dy.Pic, _ = doc.Find(".pic img").Attr("src")
 	dy.Title = strings.TrimSpace(doc.Find(".text p").Eq(0).Find("span").Text())
 
-	if find := strings.Contains("test-v1", "v1"); find {
-		fmt.Println("find the character.")
-	}
-	if strings.Contains(dy.LongTitle, "更新至") && dy.Type[0] == "电视剧" {
-		dy.DownStatus = 0
-	}
-
 	if dy.Type[0] == "电视剧" {
 
 		match, _ := regexp.MatchString(`全\d*集$`, dy.LongTitle)

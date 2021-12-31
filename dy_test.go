@@ -86,7 +86,5 @@ func TestZz(t *testing.T) {
 		match2, err2 := regexp.MatchString(`更新至\d*集$`, v)
 
 		fmt.Println(match2, err2, v)
-
 	}
-
 }
