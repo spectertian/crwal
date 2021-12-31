@@ -16,12 +16,14 @@ type DownStruct struct {
 }
 
 type DownInfoStruct struct {
-	CId        string `bson:"c_id"`
-	Title      string
-	Type       []string
-	Url        string
-	DownStatus int
-	DownUrl    []DownStruct `bson:"down_url"`
+	CId         string `bson:"c_id"`
+	Title       string
+	Type        []string
+	Url         string
+	DownStatus  int
+	DownUrl     []DownStruct `bson:"down_url"`
+	UpdatedTime time.Time    `bson:"updated_time"`
+	CreatedTime time.Time    `bson:"created_time"`
 }
 
 type Dy struct {
@@ -39,7 +41,8 @@ type Dy struct {
 	LastUpdated       string `bson:"last_updated"`
 	UpdatedDate       string `bson:"updated_date"`
 	Source            string
-	UpdateTime        time.Time `bson:"update_time"`
+	UpdatedTime       time.Time `bson:"updated_time"`
+	CreatedTime       time.Time `bson:"created_time"`
 	ProductionDate    string    `bson:"production_date"`
 	PageDate          string    `bson:"page_date"`
 	Rating            string

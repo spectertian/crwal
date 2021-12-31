@@ -66,7 +66,7 @@ func SaveAndUpdateDownInfo(down_info *model.DownInfoStruct) string {
 			return ""
 		}
 	} else {
-
+		down_info.UpdatedTime = time.Now()
 		filter := bson.D{{"url", down_info.Url}}
 		update := bson.D{{"$set", down_info}}
 		_, err := coll.UpdateMany(context.TODO(), filter, update)

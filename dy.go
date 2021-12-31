@@ -23,9 +23,9 @@ func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
 	i := 1
 	for {
 		url := fmt.Sprintf(crawl_url, i)
-		fmt.Println(url)
 		dy := model.Dy{}
-		dy.UpdateTime = time.Now()
+		dy.UpdatedTime = time.Now()
+		dy.CreatedTime = time.Now()
 
 		res, err := http.Get(url)
 		if err != nil {
@@ -133,6 +133,8 @@ func CrwaInfo(dy *model.Dy) {
 	down_info.DownStatus = dy.DownStatus
 	down_info.CId = dy.CId
 	down_info.Type = dy.Type
+	down_info.UpdatedTime = dy.UpdatedTime
+	down_info.CreatedTime = dy.CreatedTime
 	db.SaveAndUpdateDownInfo(&down_info)
 }
 
