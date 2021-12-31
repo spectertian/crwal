@@ -24,7 +24,7 @@ func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
 	for {
 		url := fmt.Sprintf(crawl_url, i)
 		fmt.Println(url)
-		dy := &model.Dy{}
+		dy := model.Dy{}
 		dy.UpdateTime = time.Now()
 
 		res, err := http.Get(url)
@@ -48,7 +48,7 @@ func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
 			dy.LongTitle = strings.TrimSpace(s.Find(".text_info h2 a").Text())
 			dy.PageDate = strings.TrimSpace(s.Find(".text_info .update_time").Text())
 			dy.Url = domin + strings.TrimSpace(hrefs)
-			dy.DownStatus = 0
+			dy.DownStatus = 1
 			Regexp := regexp.MustCompile(`([^/]*?)\.html`)
 			params := Regexp.FindStringSubmatch(dy.Url)
 
@@ -64,7 +64,7 @@ func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
 			} else {
 				fmt.Println("开始抓取", dy.LongTitle)
 			}
-			CrwaInfo(dy)
+			CrwaInfo(&dy)
 		})
 
 		_, ok := doc.Find(".pagination li").Eq(5).Find("a").Attr("href")
@@ -128,11 +128,12 @@ func CrwaInfo(dy *model.Dy) {
 
 	down_info := model.DownInfoStruct{}
 	down_info.DownUrl = dy.DownUrl
+	down_info.Url = dy.Url
 	down_info.Title = dy.LongTitle
 	down_info.DownStatus = dy.DownStatus
 	down_info.CId = dy.CId
 	down_info.Type = dy.Type
-	db.SaveDownInfo(&down_info)
+	db.SaveAndUpdateDownInfo(&down_info)
 }
 
 func GetContentNewAll(dy *model.Dy) model.Dy {
@@ -150,7 +151,6 @@ func GetContentNewAll(dy *model.Dy) model.Dy {
 	dy.Title = strings.TrimSpace(doc.Find(".text p").Eq(0).Find("span").Text())
 
 	if dy.Type[0] == "电视剧" {
-
 		match, _ := regexp.MatchString(`全\d*集$`, dy.LongTitle)
 		if match {
 			dy.DownStatus = 1
@@ -160,7 +160,6 @@ func GetContentNewAll(dy *model.Dy) model.Dy {
 				dy.DownStatus = 0
 			}
 		}
-
 	}
 
 	em := doc.Find(".text p").Eq(1).Find("em").Text()
