@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"time"
 )
 
 var client = util.GetMClient()
@@ -35,14 +36,14 @@ func SaveDy(dy *model.Dy) string {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("新增: %s\n", dy.LongTitle)
+		fmt.Println("新增", dy.LongTitle, time.Now().Format("2006-01-02 15:04:05"))
 		if oid, ok := result.InsertedID.(primitive.ObjectID); ok {
 			return oid.String()
 		} else {
 			return ""
 		}
 	} else {
-		fmt.Printf("已存在 %s\n", dy.LongTitle)
+		fmt.Println("已存在", dy.LongTitle, time.Now().Format("2006-01-02 15:04:05"))
 		return ""
 	}
 
@@ -57,7 +58,8 @@ func SaveAndUpdateDownInfo(down_info *model.DownInfoStruct) string {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("新增下载信息: %s\n", down_info.Title)
+		fmt.Println("新增下载信息", down_info.Title, time.Now().Format("2006-01-02 15:04:05"))
+
 		if oid, ok := result.InsertedID.(primitive.ObjectID); ok {
 			return oid.String()
 		} else {
@@ -71,9 +73,7 @@ func SaveAndUpdateDownInfo(down_info *model.DownInfoStruct) string {
 		if err != nil {
 			panic(err)
 		}
-
-		fmt.Printf("更新下载信息 %s\n", down_info.Title)
+		fmt.Println("更新下载信息", down_info.Title, time.Now().Format("2006-01-02 15:04:05"))
 		return ""
-
 	}
 }

@@ -42,7 +42,7 @@ func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
 			log.Fatal(err)
 		}
 
-		fmt.Println("开始抓取详情数据：", url)
+		fmt.Println("开始:", url, time.Now().Format("2006-01-02 15:04:05"))
 		doc.Find("#list_all ul li").Each(func(i int, s *goquery.Selection) {
 			hrefs, _ := s.Find(".text_info h2 a").Attr("href")
 			dy.LongTitle = strings.TrimSpace(s.Find(".text_info h2 a").Text())
@@ -62,7 +62,7 @@ func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
 				fmt.Println("已保存数据", dy.LongTitle)
 				return
 			} else {
-				fmt.Println("开始抓取", dy.LongTitle)
+				fmt.Println("开始抓取", dy.Url, dy.LongTitle, time.Now().Format("2006-01-02 15:04:05"))
 			}
 			CrwaInfo(&dy)
 		})
