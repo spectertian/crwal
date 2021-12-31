@@ -334,6 +334,8 @@ func GetHttpHtmlContent(url string, selector string, sel interface{}) (string, e
 }
 
 func main() {
+	fmt.Println("抓取开始", time.Now())
+	starts := time.Now().Unix()
 	wg.Add(10)
 	list := []string{
 		"https://www.domp4.cc/list/1-%v.html",
@@ -353,5 +355,9 @@ func main() {
 	}
 
 	wg.Wait()
+
+	ends := time.Now().Unix()
+
 	fmt.Println("抓取结束", time.Now())
+	fmt.Println("耗时", time.Now(), starts, ends, ends-starts)
 }
