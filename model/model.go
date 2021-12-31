@@ -34,6 +34,7 @@ type Dy struct {
 	Alias             []string
 	LongTitle         string `bson:"long_title"`
 	Pic               string
+	img_url           string
 	Director          []string
 	Stars             []string
 	Introduction      string

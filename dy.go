@@ -26,7 +26,6 @@ func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
 		dy := model.Dy{}
 		dy.UpdatedTime = time.Now()
 		dy.CreatedTime = time.Now()
-
 		res, err := http.Get(url)
 		if err != nil {
 			log.Fatal(err)
@@ -79,7 +78,8 @@ func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
 func GetHotList() {
 	url := "https://www.domp4.cc/list/99-1.html"
 	dy := &model.Dy{}
-	dy.UpdateTime = time.Now()
+	dy.UpdatedTime = time.Now()
+	dy.CreatedTime = time.Now()
 
 	res, err := http.Get(url)
 	if err != nil {
