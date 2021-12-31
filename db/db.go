@@ -31,10 +31,7 @@ func SaveDy(dy *model.Dy) string {
 	var result bson.M
 	err := coll.FindOne(context.TODO(), bson.D{{"url", dy.Url}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
-		fmt.Printf("已存在 %s\n", dy.LongTitle)
-
 		result, err := coll.InsertOne(context.TODO(), dy)
-
 		if err != nil {
 			panic(err)
 		}
@@ -44,34 +41,39 @@ func SaveDy(dy *model.Dy) string {
 		} else {
 			return ""
 		}
+	} else {
+		fmt.Printf("已存在 %s\n", dy.LongTitle)
+		return ""
 	}
-	if err != nil {
-		panic(err)
-	}
-	return ""
+
 }
 
-func SaveDownInfo(down_info *model.DownInfoStruct) string {
-
+func SaveAndUpdateDownInfo(down_info *model.DownInfoStruct) string {
 	coll := client.Database("dy").Collection("down_info")
 	var result bson.M
 	err := coll.FindOne(context.TODO(), bson.D{{"url", down_info.Url}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
-		fmt.Printf("已存在 %s\n", down_info.Title)
 		result, err := coll.InsertOne(context.TODO(), down_info)
-
 		if err != nil {
 			panic(err)
 		}
-		fmt.Printf("新增: %s\n", down_info.Title)
+		fmt.Printf("新增下载信息: %s\n", down_info.Title)
 		if oid, ok := result.InsertedID.(primitive.ObjectID); ok {
 			return oid.String()
 		} else {
 			return ""
 		}
+	} else {
+
+		filter := bson.D{{"url", down_info.Url}}
+		update := bson.D{{"$set", down_info}}
+		_, err := coll.UpdateMany(context.TODO(), filter, update)
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Printf("更新下载信息 %s\n", down_info.Title)
+		return ""
+
 	}
-	if err != nil {
-		panic(err)
-	}
-	return ""
 }
