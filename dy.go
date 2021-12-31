@@ -101,7 +101,7 @@ func GetHotList() {
 		dy.LongTitle = strings.TrimSpace(s.Find("a").Text())
 		dy.PageDate = strings.TrimSpace(s.Find("span").Text())
 		dy.Url = domin + strings.TrimSpace(hrefs)
-		dy.DownStatus = 0
+		dy.DownStatus = 1
 		Regexp := regexp.MustCompile(`([^/]*?)\.html`)
 		params := Regexp.FindStringSubmatch(dy.Url)
 
@@ -125,6 +125,14 @@ func GetHotList() {
 func CrwaInfo(dy *model.Dy) {
 	dy_info := GetContentNewAll(dy)
 	db.SaveDy(&dy_info)
+
+	down_info := model.DownInfoStruct{}
+	down_info.DownUrl = dy.DownUrl
+	down_info.Title = dy.LongTitle
+	down_info.DownStatus = dy.DownStatus
+	down_info.CId = dy.CId
+	down_info.Type = dy.Type
+	db.SaveDownInfo(&down_info)
 }
 
 func GetContentNewAll(dy *model.Dy) model.Dy {
@@ -140,6 +148,27 @@ func GetContentNewAll(dy *model.Dy) model.Dy {
 	dy.ProductionDate = strings.TrimSpace(doc.Find(".pubtime").Text())
 	dy.Pic, _ = doc.Find(".pic img").Attr("src")
 	dy.Title = strings.TrimSpace(doc.Find(".text p").Eq(0).Find("span").Text())
+
+	if find := strings.Contains("test-v1", "v1"); find {
+		fmt.Println("find the character.")
+	}
+	if strings.Contains(dy.LongTitle, "更新至") && dy.Type[0] == "电视剧" {
+		dy.DownStatus = 0
+	}
+
+	if dy.Type[0] == "电视剧" {
+
+		match, _ := regexp.MatchString(`全\d*集$`, dy.LongTitle)
+		if match {
+			dy.DownStatus = 1
+		} else {
+			match2, _ := regexp.MatchString(`更新至\d*集$`, dy.LongTitle)
+			if match2 {
+				dy.DownStatus = 0
+			}
+		}
+
+	}
 
 	em := doc.Find(".text p").Eq(1).Find("em").Text()
 	if em == "别名：" {
@@ -330,5 +359,5 @@ func main() {
 	}
 
 	wg.Wait()
-	fmt.Println("抓取结束", time.Time{})
+	fmt.Println("抓取结束", time.Now())
 }

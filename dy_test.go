@@ -2,6 +2,8 @@ package main
 
 import (
 	"crwal/model"
+	"fmt"
+	"regexp"
 	"sync"
 	"testing"
 )
@@ -28,7 +30,7 @@ func TestGetContentNewAll(t *testing.T) {
 
 	kk := []string{
 		"https://www.domp4.cc/html/tmtO6gOOOOOg.html",
-		"https://www.domp4.cc//html/X1os0SAAAAAS.html",
+		"https://www.domp4.cc/html/X1os0SAAAAAS.html",
 	}
 
 	for _, v := range kk {
@@ -44,20 +46,47 @@ func TestGetContentNewAll(t *testing.T) {
 }
 
 func TestGetFetchUrl(t *testing.T) {
-	//list := []string{
-	//	"https: //www.domp4.cc/list/1-%v.html",
-	//	"https: //www.domp4.cc/list/2-%v.html",
-	//	"https: //www.domp4.cc/list/3-%v.html",
-	//	"https: //www.domp4.cc/list/4-%v.html",
-	//	"https: //www.domp4.cc/list/5-%v.html",
-	//	"https: //www.domp4.cc/list/6-%v.html",
-	//	"https: //www.domp4.cc/list/7-%v.html",
-	//	"https: //www.domp4.cc/list/8-%v.html",
-	//	"https: //www.domp4.cc/list/9-%v.html",
-	//	"https: //www.domp4.cc/list/10-%v.html",
-	//}
+
 	list := "https: //www.domp4.cc/list/1-%v.html"
 	var wg *sync.WaitGroup
 	GetFetchUrl(list, wg)
+}
+
+func TestCrwaInfo(t *testing.T) {
+
+	list := []model.Dy{}
+
+	dy := &model.Dy{}
+	dy.Url = "https://www.domp4.cc/detail/16459.html"
+	list = append(list, *dy)
+
+	dy2 := &model.Dy{}
+	dy2.Url = "https://www.domp4.cc/html/SJZIpWVVVVVW.html"
+	list = append(list, *dy2)
+
+	for _, v := range list {
+		CrwaInfo(&v)
+	}
+
+}
+
+func TestZz(t *testing.T) {
+
+	list := []string{
+		"2005悬疑美剧《天鹅人》更新至13集",
+		"2020生活美剧《联系》第一季更新至全8集",
+		"2020搞笑美剧《忙碌黛布拉三连》第一季全集",
+	}
+	for _, v := range list {
+
+		match, err := regexp.MatchString(`全\d*集$`, v)
+
+		fmt.Println(match, err, v)
+
+		match2, err2 := regexp.MatchString(`更新至\d*集$`, v)
+
+		fmt.Println(match2, err2, v)
+
+	}
 
 }

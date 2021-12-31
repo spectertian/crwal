@@ -14,6 +14,16 @@ type DownStruct struct {
 	Url   string
 	Type  string
 }
+
+type DownInfoStruct struct {
+	CId        string `bson:"c_id"`
+	Title      string
+	Type       []string
+	Url        string
+	DownStatus int
+	DownUrl    []DownStruct `bson:"down_url"`
+}
+
 type Dy struct {
 	Url               string
 	CId               string `bson:"c_id"`
