@@ -20,7 +20,7 @@ type DownInfoStruct struct {
 	Title       string
 	Type        []string
 	Url         string
-	DownStatus  int
+	DownStatus  int          `bson:"down_status"`
 	DownUrl     []DownStruct `bson:"down_url"`
 	UpdatedTime time.Time    `bson:"updated_time"`
 	CreatedTime time.Time    `bson:"created_time"`
@@ -34,11 +34,11 @@ type Dy struct {
 	Alias             []string
 	LongTitle         string `bson:"long_title"`
 	Pic               string
-	img_url           string
+	imgUrl            string `bson:"img_url"`
 	Director          []string
 	Stars             []string
 	Introduction      string
-	DownStatus        int
+	DownStatus        int    `bson:"down_status"`
 	LastUpdated       string `bson:"last_updated"`
 	UpdatedDate       string `bson:"updated_date"`
 	Source            string

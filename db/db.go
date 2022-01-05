@@ -14,7 +14,7 @@ import (
 var client = util.GetMClient()
 
 func IsDyListOk(url string) string {
-	coll := client.Database("dy").Collection("list")
+	coll := client.Database("dy").Collection("lists")
 	var result model.Default
 	err := coll.FindOne(context.TODO(), bson.D{{"url", url}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
@@ -28,7 +28,7 @@ func IsDyListOk(url string) string {
 }
 
 func SaveDy(dy *model.Dy) string {
-	coll := client.Database("dy").Collection("list")
+	coll := client.Database("dy").Collection("lists")
 	var result bson.M
 	err := coll.FindOne(context.TODO(), bson.D{{"url", dy.Url}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
