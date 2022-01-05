@@ -26,6 +26,7 @@ func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
 		dy := model.Dy{}
 		dy.UpdatedTime = time.Now()
 		dy.CreatedTime = time.Now()
+		dy.Status = 1
 		res, err := http.Get(url)
 		if err != nil {
 			log.Fatal(err)
@@ -129,7 +130,8 @@ func CrwaInfo(dy *model.Dy) {
 	down_info := model.DownInfoStruct{}
 	down_info.DownUrl = dy.DownUrl
 	down_info.Url = dy.Url
-	down_info.Title = dy.LongTitle
+	down_info.Title = dy.Title
+	down_info.LongTitle = dy.LongTitle
 	down_info.DownStatus = dy.DownStatus
 	down_info.CId = dy.CId
 	down_info.Type = dy.Type

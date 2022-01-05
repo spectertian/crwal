@@ -18,6 +18,7 @@ type DownStruct struct {
 type DownInfoStruct struct {
 	CId         string `bson:"c_id"`
 	Title       string
+	LongTitle   string `bson:"long_title"`
 	Type        []string
 	Url         string
 	DownStatus  int          `bson:"down_status"`
@@ -57,7 +58,7 @@ type Dy struct {
 	Language          string
 	DownUrl           []DownStruct `bson:"down_url"`
 	ProductionCompany string       `bson:"production_company"`
-	Status            string
+	Status            int
 	ClickCount        int `bson:"click_count"`
 	DownCount         int `bson:"down_count"`
 }
