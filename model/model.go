@@ -6,7 +6,8 @@ import (
 )
 
 type Default struct {
-	ID primitive.ObjectID `bson:"_id" json:"id,omitempty"`
+	ID         primitive.ObjectID `bson:"_id" json:"id,omitempty"`
+	DownStatus int                `bson:"down_status"`
 }
 
 type DownStruct struct {

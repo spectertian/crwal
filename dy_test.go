@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crwal/db"
 	"crwal/model"
 	"fmt"
 	"regexp"
@@ -87,4 +88,15 @@ func TestZz(t *testing.T) {
 
 		fmt.Println(match2, err2, v)
 	}
+}
+
+func TestGetDyInfo(t *testing.T) {
+
+	list := []string{"https://www.domp4.cc//detail/6242.html", "https://www.domp4.cc//html/fNPU26333336.html"}
+
+	for _, v := range list {
+		ss := db.GetDyInfo(v)
+		fmt.Println(v, ss)
+	}
+
 }

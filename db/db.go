@@ -27,6 +27,38 @@ func IsDyListOk(url string) string {
 	return result.ID.Hex()
 }
 
+func IsDownOk(url string) int {
+	coll := client.Database("dy").Collection("lists")
+	var result model.Default
+	err := coll.FindOne(context.TODO(), bson.D{{"url", url}}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		return 3
+	}
+	if err != nil {
+		panic(err)
+	}
+
+	return result.DownStatus
+}
+
+func GetDyInfo(url string) model.Default {
+
+	coll := client.Database("dy").Collection("lists")
+	var result model.Default
+	err := coll.FindOne(context.TODO(), bson.D{{"url", url}}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		ss := model.Default{}
+		ss.DownStatus = 8
+		return ss
+	}
+	if err != nil {
+		panic(err)
+	}
+
+	return result
+
+}
+
 func SaveDy(dy *model.Dy) string {
 	coll := client.Database("dy").Collection("lists")
 	var result bson.M

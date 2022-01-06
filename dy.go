@@ -51,11 +51,23 @@ func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
 			dy.DownStatus = 1
 			Regexp := regexp.MustCompile(`([^/]*?)\.html`)
 			params := Regexp.FindStringSubmatch(dy.Url)
-
 			dy.CId = params[1]
+
 			if dy.Url == "" {
 				fmt.Println("不存在url", dy)
 				return
+			}
+
+			dy_info := db.GetDyInfo(dy.Url)
+			if dy_info.DownStatus == 1 {
+				fmt.Println("已保存数据", dy.LongTitle)
+				return
+			}
+
+			if dy_info.DownStatus == 0 {
+				fmt.Println("开始抓取  更新数据", dy.Url, dy.LongTitle, time.Now().Format("2006-01-02 15:04:05"))
+			} else {
+				fmt.Println("开始抓取", dy.Url, dy.LongTitle, time.Now().Format("2006-01-02 15:04:05"))
 			}
 
 			if db.IsDyListOk(dy.Url) != "" {
