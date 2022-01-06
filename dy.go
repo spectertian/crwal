@@ -70,12 +70,6 @@ func GetFetchUrl(crawl_url string, wg *sync.WaitGroup) {
 				fmt.Println("开始抓取", dy.Url, dy.LongTitle, time.Now().Format("2006-01-02 15:04:05"))
 			}
 
-			if db.IsDyListOk(dy.Url) != "" {
-				fmt.Println("已保存数据", dy.LongTitle)
-				return
-			} else {
-				fmt.Println("开始抓取", dy.Url, dy.LongTitle, time.Now().Format("2006-01-02 15:04:05"))
-			}
 			CrwaInfo(&dy)
 		})
 
