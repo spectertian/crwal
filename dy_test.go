@@ -32,6 +32,7 @@ func TestGetContentNewAll(t *testing.T) {
 	kk := []string{
 		"https://www.domp4.cc/html/tmtO6gOOOOOg.html",
 		"https://www.domp4.cc/html/X1os0SAAAAAS.html",
+		"https://www.domp4.cc/html/S4wW3N77777N.html",
 	}
 
 	for _, v := range kk {
@@ -40,8 +41,10 @@ func TestGetContentNewAll(t *testing.T) {
 		ss := GetContentNewAll(dy)
 		//t.Log(ss.Director)
 		//t.Log(ss.Stars)
-		t.Log(ss.Title)
-		t.Log(ss.Alias)
+		// t.Log(ss.Title)
+		// t.Log(ss.Alias)
+		t.Log(ss.Introduction)
+		t.Log("########################################")
 	}
 
 }

@@ -5,14 +5,15 @@ import (
 	"crwal/db"
 	"crwal/model"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/chromedp/chromedp"
 	"log"
 	"net/http"
 	"regexp"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/chromedp/chromedp"
 )
 
 var domin = "https://www.domp4.cc/"
@@ -209,7 +210,7 @@ func GetContentNewAll(dy *model.Dy) model.Dy {
 	})
 	dy.Tags = tags
 
-	dy.Introduction = strings.TrimSpace(doc.Find(".article-related p").Text())
+	dy.Introduction = strings.TrimSpace(doc.Find(".article-related").Find("p").Eq(0).Text())
 
 	down_Urls := []model.DownStruct{}
 	doc.Find(".url-left").Each(func(i int, s *goquery.Selection) {
