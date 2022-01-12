@@ -59,9 +59,44 @@ func GetDyInfo(url string) model.Default {
 
 }
 
+func IsHasUpdateByUrl(url string) string {
+	coll := client.Database("dy").Collection("update")
+	var result model.UpdateHas
+	err := coll.FindOne(context.TODO(), bson.D{{"url", url}}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		return ""
+	}
+	if err != nil {
+		panic(err)
+	}
+
+	return result.ID.Hex()
+}
+
+func SaveUpdate(update *model.Update) string {
+	coll := client.Database("dy").Collection("update")
+	var result bson.M
+	err := coll.FindOne(context.TODO(), bson.D{{"url", update.Url}}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		result, err := coll.InsertOne(context.TODO(), update)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("新增", update.Title, time.Now().Format("2006-01-02 15:04:05"))
+		if oid, ok := result.InsertedID.(primitive.ObjectID); ok {
+			return oid.String()
+		} else {
+			return ""
+		}
+	} else {
+		fmt.Println("已存在", update.Title, time.Now().Format("2006-01-02 15:04:05"))
+		return ""
+	}
+}
+
 func SaveDy(dy *model.Dy) string {
 	coll := client.Database("dy").Collection("lists")
-	var result bson.M
+	var result model.Default
 	err := coll.FindOne(context.TODO(), bson.D{{"url", dy.Url}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
 		result, err := coll.InsertOne(context.TODO(), dy)
@@ -70,15 +105,14 @@ func SaveDy(dy *model.Dy) string {
 		}
 		fmt.Println("新增", dy.LongTitle, time.Now().Format("2006-01-02 15:04:05"))
 		if oid, ok := result.InsertedID.(primitive.ObjectID); ok {
-			return oid.String()
+			return oid.Hex()
 		} else {
 			return ""
 		}
 	} else {
 		fmt.Println("已存在", dy.LongTitle, time.Now().Format("2006-01-02 15:04:05"))
-		return ""
+		return result.ID.Hex()
 	}
-
 }
 
 func SaveAndUpdateDownInfo(down_info *model.DownInfoStruct) string {

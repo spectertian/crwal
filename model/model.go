@@ -8,6 +8,12 @@ import (
 type Default struct {
 	ID         primitive.ObjectID `bson:"_id" json:"id,omitempty"`
 	DownStatus int                `bson:"down_status"`
+	LongTitle  string             `bson:"long_title"`
+}
+
+type UpdateHas struct {
+	ID         primitive.ObjectID `bson:"_id" json:"id,omitempty"`
+	DownStatus int                `bson:"down_status"`
 }
 
 type DownStruct struct {
@@ -62,4 +68,14 @@ type Dy struct {
 	Status            int
 	ClickCount        int `bson:"click_count"`
 	DownCount         int `bson:"down_count"`
+}
+
+type Update struct {
+	Url         string
+	InfoId      string `bson:"info_id"`
+	CId         string `bson:"c_id"`
+	Title       string
+	Date        string
+	Type        string
+	CreatedTime time.Time `bson:"created_time"`
 }
