@@ -27,6 +27,20 @@ func IsDyListOk(url string) string {
 	return result.ID.Hex()
 }
 
+func IsHasNewsByUrl(url string) string {
+	coll := client.Database("dy").Collection("news")
+	var result model.UpdateHas
+	err := coll.FindOne(context.TODO(), bson.D{{"url", url}}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		return ""
+	}
+	if err != nil {
+		panic(err)
+	}
+
+	return result.ID.Hex()
+}
+
 func IsDownOk(url string) int {
 	coll := client.Database("dy").Collection("lists")
 	var result model.Default
@@ -75,6 +89,27 @@ func IsHasUpdateByUrl(url string) string {
 
 func SaveUpdate(update *model.Update) string {
 	coll := client.Database("dy").Collection("update")
+	var result bson.M
+	err := coll.FindOne(context.TODO(), bson.D{{"url", update.Url}}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		result, err := coll.InsertOne(context.TODO(), update)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("新增", update.Title, time.Now().Format("2006-01-02 15:04:05"))
+		if oid, ok := result.InsertedID.(primitive.ObjectID); ok {
+			return oid.String()
+		} else {
+			return ""
+		}
+	} else {
+		fmt.Println("已存在", update.Title, time.Now().Format("2006-01-02 15:04:05"))
+		return ""
+	}
+}
+
+func SaveNews(update *model.NewsStruct) string {
+	coll := client.Database("dy").Collection("news")
 	var result bson.M
 	err := coll.FindOne(context.TODO(), bson.D{{"url", update.Url}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {

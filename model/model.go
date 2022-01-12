@@ -79,3 +79,12 @@ type Update struct {
 	Type        string
 	CreatedTime time.Time `bson:"created_time"`
 }
+
+type NewsStruct struct {
+	Url         string
+	InfoId      string `bson:"info_id"`
+	CId         string `bson:"c_id"`
+	Title       string
+	Date        string
+	CreatedTime time.Time `bson:"created_time"`
+}

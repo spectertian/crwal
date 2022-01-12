@@ -18,101 +18,97 @@ import (
 var domin = "https://www.domp4.cc/"
 var wg sync.WaitGroup
 
-func GetFetchUrl(url string) {
-	res, err := http.Get(url)
-	if err != nil {
-		log.Fatal(err)
-	}
-	res.Close = true
-	res.Header.Add("Connection", "close")
-	defer res.Body.Close()
-	if res.StatusCode != 200 {
-		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
-	}
-	doc, err := goquery.NewDocumentFromReader(res.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
+func GetFetchUrl(crawl_url string) {
 
-	chans := make(chan model.Update, 200)
-
-	fmt.Println("开始:", url, time.Now().Format("2006-01-02 15:04:05"))
-	doc.Find("#vod .list-group-item").Each(func(i int, s *goquery.Selection) {
-		hrefs, _ := s.Find("a").Attr("href")
-		update := model.Update{}
-		update.Type = "电影"
-		update.CreatedTime = time.Now()
-		update.Date = strings.TrimSpace(s.Find("b").Text())
-		update.Title = strings.TrimSpace(s.Find("a").Text())
-		update.Url = domin + strings.TrimSpace(hrefs)
-		Regexp := regexp.MustCompile(`([^/]*?)\.html`)
-		params := Regexp.FindStringSubmatch(update.Url)
-		update.CId = params[1]
-
-		if update.Url == "" {
-			fmt.Println("不存在url", update)
-			return
-		}
-
-		hasId := db.IsHasUpdateByUrl(update.Url)
-		if hasId != "" {
-			fmt.Println("已保存数据", update.Title)
-			return
-		}
-
-		chans <- update
-		fmt.Println("开始抓取", update.Url, update.Title, time.Now().Format("2006-01-02 15:04:05"))
-	})
-
-	doc.Find("#tv .list-group-item").Each(func(i int, s *goquery.Selection) {
-		update := model.Update{}
-		update.Type = "电视剧"
-		update.CreatedTime = time.Now()
-		hrefs, _ := s.Find("a").Attr("href")
-		update.Date = strings.TrimSpace(s.Find("b").Text())
-		update.Title = strings.TrimSpace(s.Find("a").Text())
-
-		update.Url = domin + strings.TrimSpace(hrefs)
-		Regexp := regexp.MustCompile(`([^/]*?)\.html`)
-		params := Regexp.FindStringSubmatch(update.Url)
-		update.CId = params[1]
-
-		if update.Url == "" {
-			fmt.Println("不存在url", update)
-			return
-		}
-
-		hasId := db.IsHasUpdateByUrl(update.Url)
-		if hasId != "" {
-			fmt.Println("已保存数据", update.Title)
-			return
-		}
-
-		chans <- update
-		fmt.Println("开始抓取", update.Url, update.Title, time.Now().Format("2006-01-02 15:04:05"))
-	})
-
-	close(chans)
+	chans := make(chan model.NewsStruct, 2000)
+	news := model.NewsStruct{}
+	chans <- news
 
 	wg.Add(5)
+
 	for i := 1; i <= 5; i++ {
-		go CrwalInfo(chans, &wg)
+		CrwalInfo(&chans, &wg)
+	}
+
+	i := 1
+	for {
+		url := fmt.Sprintf(crawl_url, i)
+		news := model.NewsStruct{}
+		news.CreatedTime = time.Now()
+		res, err := http.Get(url)
+		if err != nil {
+			log.Fatal(err)
+		}
+		res.Close = true
+		res.Header.Add("Connection", "close")
+		defer res.Body.Close()
+		if res.StatusCode != 200 {
+			log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+		}
+		doc, err := goquery.NewDocumentFromReader(res.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Println("开始:", url, time.Now().Format("2006-01-02 15:04:05"))
+		doc.Find("#list_dy ul li").Each(func(i int, s *goquery.Selection) {
+			hrefs, _ := s.Find("a").Attr("href")
+			news.Title = strings.TrimSpace(s.Find(" a").Text())
+			news.Date = strings.TrimSpace(s.Find("span").Text())
+			news.Url = domin + strings.TrimSpace(hrefs)
+			Regexp := regexp.MustCompile(`([^/]*?)\.html`)
+			params := Regexp.FindStringSubmatch(news.Url)
+			news.CId = params[1]
+
+			if news.Url == "" {
+				fmt.Println("不存在url", news)
+				return
+			}
+
+			news_id := db.IsHasNewsByUrl(news.Url)
+			if news_id == "" {
+				fmt.Println("已保存数据", news.Title)
+				return
+			}
+			chans <- news
+		})
+
+		_, ok := doc.Find(".pagination li").Eq(5).Find("a").Attr("href")
+		if ok == false {
+
+			for i := 1; i <= 5; i++ {
+				news := model.NewsStruct{}
+				news.Url = "xxx"
+				chans <- news
+			}
+			fmt.Println(crawl_url, "页面url便利完成")
+			break
+		}
+		i++
 	}
 	wg.Wait()
 }
 
-func CrwalInfo(chans chan model.Update, wg *sync.WaitGroup) {
+func CrwalInfo(chans *chan model.NewsStruct, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for {
 		select {
-		case update, ok := <-chans:
+		case news, ok := <-*chans:
 			if ok {
-				info := db.GetDyInfo(update.Url)
-				if info.LongTitle != update.Title {
+				if news.Url == "" {
+					return
+				}
+
+				if news.Url == "xxx" {
+					goto forEnd
+
+				}
+				info := db.GetDyInfo(news.Url)
+				if info.LongTitle != news.Title {
 					dy := model.Dy{}
-					dy.Url = update.Url
-					dy.LongTitle = update.Title
-					dy.CId = update.CId
+					dy.Url = news.Url
+					dy.LongTitle = news.Title
+					dy.CId = news.CId
 					dy_info := GetContentNewAll(&dy)
 					info_id := db.SaveDy(&dy_info)
 
@@ -128,11 +124,11 @@ func CrwalInfo(chans chan model.Update, wg *sync.WaitGroup) {
 					down_info.CreatedTime = dy.CreatedTime
 					db.SaveAndUpdateDownInfo(&down_info)
 
-					update.InfoId = info_id
-					db.SaveUpdate(&update)
+					news.InfoId = info_id
+					db.SaveNews(&news)
 				} else {
-					update.InfoId = info.ID.Hex()
-					db.SaveUpdate(&update)
+					news.InfoId = info.ID.Hex()
+					db.SaveNews(&news)
 				}
 
 			} else {
@@ -266,7 +262,7 @@ func GetContentNewAll(dy *model.Dy) model.Dy {
 func main() {
 	fmt.Println("抓取开始", time.Now())
 	starts := time.Now().Unix()
-	url := "https://www.domp4.cc/custom/update.html"
+	url := "https://www.domp4.cc/list/99-%v.html"
 	GetFetchUrl(url)
 	ends := time.Now().Unix()
 
