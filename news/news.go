@@ -19,17 +19,7 @@ var domin = "https://www.domp4.cc/"
 var wg sync.WaitGroup
 
 func GetFetchUrl(crawl_url string) {
-
 	chans := make(chan model.NewsStruct, 2000)
-	news := model.NewsStruct{}
-	chans <- news
-
-	wg.Add(5)
-
-	for i := 1; i <= 5; i++ {
-		CrwalInfo(&chans, &wg)
-	}
-
 	i := 1
 	for {
 		url := fmt.Sprintf(crawl_url, i)
@@ -66,43 +56,39 @@ func GetFetchUrl(crawl_url string) {
 			}
 
 			news_id := db.IsHasNewsByUrl(news.Url)
-			if news_id == "" {
+			if news_id != "" {
 				fmt.Println("已保存数据", news.Title)
 				return
 			}
 			chans <- news
 		})
-
 		_, ok := doc.Find(".pagination li").Eq(5).Find("a").Attr("href")
+		fmt.Println("第", i, "页")
 		if ok == false {
-
-			for i := 1; i <= 5; i++ {
-				news := model.NewsStruct{}
-				news.Url = "xxx"
-				chans <- news
-			}
 			fmt.Println(crawl_url, "页面url便利完成")
 			break
 		}
 		i++
 	}
+
+	close(chans)
+
+	wg.Add(6)
+	for i := 1; i <= 6; i++ {
+		CrwalInfo(chans, &wg)
+	}
 	wg.Wait()
+
 }
 
-func CrwalInfo(chans *chan model.NewsStruct, wg *sync.WaitGroup) {
+func CrwalInfo(chans chan model.NewsStruct, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for {
 		select {
-		case news, ok := <-*chans:
+		case news, ok := <-chans:
 			if ok {
-				if news.Url == "" {
-					return
-				}
 
-				if news.Url == "xxx" {
-					goto forEnd
-
-				}
+				fmt.Println(news)
 				info := db.GetDyInfo(news.Url)
 				if info.LongTitle != news.Title {
 					dy := model.Dy{}
