@@ -23,6 +23,10 @@ type UpdateHas struct {
 	DownStatus int                `bson:"down_status"`
 }
 
+type IndexHas struct {
+	ID primitive.ObjectID `bson:"_id" json:"id,omitempty"`
+}
+
 type DefaultTopicStruct struct {
 	ID primitive.ObjectID `bson:"_id" json:"id,omitempty"`
 }
@@ -125,4 +129,15 @@ type TopicListStruct struct {
 	Pic          string
 	Area         string
 	CreatedTime  time.Time `bson:"created_time"`
+}
+
+type IndexListStruct struct {
+	Url         string
+	Type        string
+	Sort        int
+	InfoId      string `bson:"info_id"`
+	CId         string `bson:"c_id"`
+	Title       string
+	Date        string
+	CreatedTime time.Time `bson:"created_time"`
 }
