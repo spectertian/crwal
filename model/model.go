@@ -6,15 +6,16 @@ import (
 )
 
 type Default struct {
-	ID         primitive.ObjectID `bson:"_id" json:"id,omitempty"`
-	DownStatus int                `bson:"down_status"`
-	LongTitle  string             `bson:"long_title"`
-	Pic        string
-	imgUrl     string `bson:"img_url"`
-	Director   []string
-	Stars      []string
-	Area       string
-	Rating     string
+	ID           primitive.ObjectID `bson:"_id" json:"id,omitempty"`
+	DownStatus   int                `bson:"down_status"`
+	LongTitle    string             `bson:"long_title"`
+	Pic          string
+	imgUrl       string `bson:"img_url"`
+	Director     []string
+	Stars        []string
+	Area         string
+	Rating       string
+	Introduction string
 }
 
 type UpdateHas struct {
@@ -110,17 +111,18 @@ type TopicStruct struct {
 }
 
 type TopicListStruct struct {
-	Url         string
-	NId         int    `bson:"n_id"`
-	InfoId      string `bson:"info_id"`
-	TopicId     string `bson:"topic_id"`
-	CId         string `bson:"c_id"`
-	Title       string
-	Director    []string
-	Stars       []string
-	Rating      string
-	imgUrl      string `bson:"img_url"`
-	Pic         string
-	Area        string
-	CreatedTime time.Time `bson:"created_time"`
+	Url          string
+	NId          int    `bson:"n_id"`
+	InfoId       string `bson:"info_id"`
+	TopicId      string `bson:"topic_id"`
+	CId          string `bson:"c_id"`
+	Introduction string
+	Title        string
+	Director     []string
+	Stars        []string
+	Rating       string
+	imgUrl       string `bson:"img_url"`
+	Pic          string
+	Area         string
+	CreatedTime  time.Time `bson:"created_time"`
 }

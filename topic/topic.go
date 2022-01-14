@@ -145,6 +145,8 @@ func CrwalInfo(chans chan ChanTopStruct, wg *sync.WaitGroup) {
 					topic_list.Area = dy_info.Area
 					topic_list.Rating = dy_info.Rating
 					topic_list.TopicId = topic_id
+					topic_list.Pic = dy_info.Pic
+					topic_list.Introduction = dy_info.Introduction
 					db.SaveTopicList(&topic_list)
 				} else {
 					topic_list.InfoId = info.ID.Hex()
@@ -153,6 +155,8 @@ func CrwalInfo(chans chan ChanTopStruct, wg *sync.WaitGroup) {
 					topic_list.Area = info.Area
 					topic_list.Rating = info.Rating
 					topic_list.TopicId = topic_id
+					topic_list.Pic = info.Pic
+					topic_list.Introduction = info.Introduction
 					db.SaveTopicList(&topic_list)
 				}
 			} else {
