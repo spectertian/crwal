@@ -87,6 +87,20 @@ func IsHasUpdateByUrl(url string) string {
 	return result.ID.Hex()
 }
 
+func IsHasTopicByUrl(url string) string {
+	coll := client.Database("dy").Collection("topic")
+	var result model.UpdateHas
+	err := coll.FindOne(context.TODO(), bson.D{{"url", url}}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		return ""
+	}
+	if err != nil {
+		panic(err)
+	}
+
+	return result.ID.Hex()
+}
+
 func SaveUpdate(update *model.Update) string {
 	coll := client.Database("dy").Collection("update")
 	var result bson.M
@@ -125,6 +139,48 @@ func SaveNews(update *model.NewsStruct) string {
 		}
 	} else {
 		fmt.Println("已存在", update.Title, time.Now().Format("2006-01-02 15:04:05"))
+		return ""
+	}
+}
+
+func SaveTopic(topic *model.TopicStruct) string {
+	coll := client.Database("dy").Collection("topic")
+	var result bson.M
+	err := coll.FindOne(context.TODO(), bson.D{{"url", topic.Url}}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		result, err := coll.InsertOne(context.TODO(), topic)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("新增", topic.Title, time.Now().Format("2006-01-02 15:04:05"))
+		if oid, ok := result.InsertedID.(primitive.ObjectID); ok {
+			return oid.String()
+		} else {
+			return ""
+		}
+	} else {
+		fmt.Println("已存在", topic.Title, time.Now().Format("2006-01-02 15:04:05"))
+		return ""
+	}
+}
+
+func SaveTopicList(topic_list *model.TopicListStruct) string {
+	coll := client.Database("dy").Collection("topic_list")
+	var result bson.M
+	err := coll.FindOne(context.TODO(), bson.D{{"url", topic_list.Url}}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		result, err := coll.InsertOne(context.TODO(), topic_list)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("新增", topic_list.Title, time.Now().Format("2006-01-02 15:04:05"))
+		if oid, ok := result.InsertedID.(primitive.ObjectID); ok {
+			return oid.String()
+		} else {
+			return ""
+		}
+	} else {
+		fmt.Println("已存在", topic_list.Title, time.Now().Format("2006-01-02 15:04:05"))
 		return ""
 	}
 }

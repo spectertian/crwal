@@ -9,6 +9,12 @@ type Default struct {
 	ID         primitive.ObjectID `bson:"_id" json:"id,omitempty"`
 	DownStatus int                `bson:"down_status"`
 	LongTitle  string             `bson:"long_title"`
+	Pic        string
+	imgUrl     string `bson:"img_url"`
+	Director   []string
+	Stars      []string
+	Area       string
+	Rating     string
 }
 
 type UpdateHas struct {
@@ -86,5 +92,30 @@ type NewsStruct struct {
 	CId         string `bson:"c_id"`
 	Title       string
 	Date        string
+	CreatedTime time.Time `bson:"created_time"`
+}
+
+type TopicStruct struct {
+	Url         string
+	NId         int    `bson:"n_id"`
+	FilmNum     string `bson:"film_nums"`
+	Title       string
+	Content     string
+	Date        string
+	CreatedTime time.Time `bson:"created_time"`
+}
+
+type TopicListStruct struct {
+	Url         string
+	NId         int    `bson:"n_id"`
+	InfoId      string `bson:"info_id"`
+	CId         string `bson:"c_id"`
+	Title       string
+	Director    []string
+	Stars       []string
+	Rating      string
+	imgUrl      string `bson:"img_url"`
+	Pic         string
+	Area        string
 	CreatedTime time.Time `bson:"created_time"`
 }
