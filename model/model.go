@@ -102,7 +102,7 @@ type NewsStruct struct {
 type TopicStruct struct {
 	Url         string
 	NId         int    `bson:"n_id"`
-	FilmNum     string `bson:"film_nums"`
+	FilmNum     string `bson:"film_num"`
 	Title       string
 	Content     string
 	Date        string
