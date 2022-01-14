@@ -41,10 +41,10 @@ func IsHasNewsByUrl(url string) string {
 	return result.ID.Hex()
 }
 
-func IsHasIndexByUrl(url string) string {
+func IsHasIndexByUrl(url string, types string) string {
 	coll := client.Database("dy").Collection("index_list")
 	var result model.IndexHas
-	err := coll.FindOne(context.TODO(), bson.D{{"url", url}}).Decode(&result)
+	err := coll.FindOne(context.TODO(), bson.D{{"url", url}, {"type", types}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
 		return ""
 	}
@@ -202,7 +202,7 @@ func SaveTopicList(topic_list *model.TopicListStruct) string {
 func SaveIndexList(index_list *model.IndexListStruct) string {
 	coll := client.Database("dy").Collection("index_list")
 	var result bson.M
-	err := coll.FindOne(context.TODO(), bson.D{{"url", index_list.Url}}).Decode(&result)
+	err := coll.FindOne(context.TODO(), bson.D{{"url", index_list.Url}, {"type", index_list.Type}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
 		result, err := coll.InsertOne(context.TODO(), index_list)
 		if err != nil {

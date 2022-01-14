@@ -58,7 +58,7 @@ func GetFetchUrl(url string) {
 				fmt.Println("不存在url", index_list)
 				return
 			}
-			index_list_id := db.IsHasIndexByUrl(index_list.Url)
+			index_list_id := db.IsHasIndexByUrl(index_list.Url, index_list.Type)
 			if index_list_id != "" {
 				fmt.Println("已保存数据", index_list.Title)
 				return
@@ -90,7 +90,7 @@ func GetFetchUrl(url string) {
 				fmt.Println("不存在url", index_list)
 				return
 			}
-			index_list_id := db.IsHasIndexByUrl(index_list.Url)
+			index_list_id := db.IsHasIndexByUrl(index_list.Url, index_list.Type)
 			if index_list_id != "" {
 				fmt.Println("已保存数据", index_list.Title)
 				return
@@ -117,7 +117,8 @@ func GetFetchUrl(url string) {
 			fmt.Println("今日推荐 不存在url", index_list)
 			return
 		}
-		index_list_id := db.IsHasIndexByUrl(index_list.Url)
+		index_list_id := db.IsHasIndexByUrl(index_list.Url, index_list.Type)
+		fmt.Println(index_list.Url)
 		if index_list_id != "" {
 			fmt.Println("今日推荐 已保存数据", index_list.Title)
 			return
@@ -143,7 +144,6 @@ func CrwalInfo(chans chan model.IndexListStruct, wg *sync.WaitGroup) {
 		select {
 		case index_list, ok := <-chans:
 			if ok {
-
 				fmt.Println(index_list)
 				info := db.GetDyInfo(index_list.Url)
 				if info.LongTitle != index_list.Title {
