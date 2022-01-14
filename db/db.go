@@ -145,7 +145,7 @@ func SaveNews(update *model.NewsStruct) string {
 
 func SaveTopic(topic *model.TopicStruct) string {
 	coll := client.Database("dy").Collection("topic")
-	var result bson.M
+	var result model.DefaultTopicStruct
 	err := coll.FindOne(context.TODO(), bson.D{{"url", topic.Url}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
 		result, err := coll.InsertOne(context.TODO(), topic)
@@ -154,13 +154,13 @@ func SaveTopic(topic *model.TopicStruct) string {
 		}
 		fmt.Println("新增", topic.Title, time.Now().Format("2006-01-02 15:04:05"))
 		if oid, ok := result.InsertedID.(primitive.ObjectID); ok {
-			return oid.String()
+			return oid.Hex()
 		} else {
 			return ""
 		}
 	} else {
 		fmt.Println("已存在", topic.Title, time.Now().Format("2006-01-02 15:04:05"))
-		return ""
+		return result.ID.Hex()
 	}
 }
 

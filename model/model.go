@@ -22,6 +22,10 @@ type UpdateHas struct {
 	DownStatus int                `bson:"down_status"`
 }
 
+type DefaultTopicStruct struct {
+	ID primitive.ObjectID `bson:"_id" json:"id,omitempty"`
+}
+
 type DownStruct struct {
 	Title string
 	Url   string
@@ -109,6 +113,7 @@ type TopicListStruct struct {
 	Url         string
 	NId         int    `bson:"n_id"`
 	InfoId      string `bson:"info_id"`
+	TopicId     string `bson:"topic_id"`
 	CId         string `bson:"c_id"`
 	Title       string
 	Director    []string

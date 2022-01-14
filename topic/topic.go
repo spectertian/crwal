@@ -113,7 +113,7 @@ func CrwalInfo(chans chan ChanTopStruct, wg *sync.WaitGroup) {
 			if ok {
 				topic := top.Top
 				topic_list := top.List
-				db.SaveTopic(&topic)
+				topic_id := db.SaveTopic(&topic)
 				info := db.GetDyInfo(topic.Url)
 				if info.LongTitle != topic_list.Title {
 					dy := model.Dy{}
@@ -121,6 +121,10 @@ func CrwalInfo(chans chan ChanTopStruct, wg *sync.WaitGroup) {
 					dy.LongTitle = topic_list.Title
 					dy.CId = topic_list.CId
 					dy_info := GetContentNewAll(&dy)
+					if dy_info.Status == 0 {
+						fmt.Println("重新抓取一次", topic_list)
+						dy_info = GetContentNewAll(&dy)
+					}
 					info_id := db.SaveDy(&dy_info)
 
 					down_info := model.DownInfoStruct{}
@@ -140,6 +144,7 @@ func CrwalInfo(chans chan ChanTopStruct, wg *sync.WaitGroup) {
 					topic_list.Stars = dy_info.Stars
 					topic_list.Area = dy_info.Area
 					topic_list.Rating = dy_info.Rating
+					topic_list.TopicId = topic_id
 					db.SaveTopicList(&topic_list)
 				} else {
 					topic_list.InfoId = info.ID.Hex()
@@ -147,6 +152,7 @@ func CrwalInfo(chans chan ChanTopStruct, wg *sync.WaitGroup) {
 					topic_list.Stars = info.Stars
 					topic_list.Area = info.Area
 					topic_list.Rating = info.Rating
+					topic_list.TopicId = topic_id
 					db.SaveTopicList(&topic_list)
 				}
 			} else {
@@ -203,7 +209,10 @@ func GetContentNewAll(dy *model.Dy) model.Dy {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
 	if err != nil {
 		log.Fatal(err)
+		return *dy
 	}
+	dy.Status = 1
+
 	//fmt.Printf(dy.Url)
 	dy.DownStatus = 1
 	dy.UpdatedTime = time.Now()
