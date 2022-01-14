@@ -49,7 +49,7 @@ func GetFetchUrl(url string) {
 				return
 			}
 			index_list.Title = strings.TrimSpace(ks.Find(" a").Text())
-			index_list.Date = strings.TrimSpace(ks.Find("span").Text())
+			index_list.Date = strings.TrimSpace(ks.Find("b").Text())
 			index_list.Url = domin + strings.TrimSpace(hrefs)
 			Regexp := regexp.MustCompile(`([^/]*?)\.html`)
 			params := Regexp.FindStringSubmatch(index_list.Url)
@@ -60,7 +60,7 @@ func GetFetchUrl(url string) {
 			}
 			index_list_id := db.IsHasIndexByUrl(index_list.Url, index_list.Type)
 			if index_list_id != "" {
-				fmt.Println("已保存数据", index_list.Title)
+				fmt.Println("已保存数据", index_list)
 				return
 			}
 
@@ -81,7 +81,7 @@ func GetFetchUrl(url string) {
 				return
 			}
 			index_list.Title = strings.TrimSpace(ks.Find(" a").Text())
-			index_list.Date = strings.TrimSpace(ks.Find("span").Text())
+			index_list.Date = strings.TrimSpace(ks.Find("b").Text())
 			index_list.Url = domin + strings.TrimSpace(hrefs)
 			Regexp := regexp.MustCompile(`([^/]*?)\.html`)
 			params := Regexp.FindStringSubmatch(index_list.Url)
@@ -92,7 +92,7 @@ func GetFetchUrl(url string) {
 			}
 			index_list_id := db.IsHasIndexByUrl(index_list.Url, index_list.Type)
 			if index_list_id != "" {
-				fmt.Println("已保存数据", index_list.Title)
+				fmt.Println("已保存数据", index_list)
 				return
 			}
 
@@ -108,7 +108,7 @@ func GetFetchUrl(url string) {
 		index_list.Sort = i
 		hrefs, _ := s.Find("a").Attr("href")
 		index_list.Title = strings.TrimSpace(s.Find(" a").Text())
-		index_list.Date = strings.TrimSpace(s.Find("span").Text())
+		index_list.Date = strings.TrimSpace(s.Find("b").Text())
 		index_list.Url = domin + strings.TrimSpace(hrefs)
 		Regexp := regexp.MustCompile(`([^/]*?)\.html`)
 		params := Regexp.FindStringSubmatch(index_list.Url)
@@ -120,7 +120,7 @@ func GetFetchUrl(url string) {
 		index_list_id := db.IsHasIndexByUrl(index_list.Url, index_list.Type)
 		fmt.Println(index_list.Url)
 		if index_list_id != "" {
-			fmt.Println("今日推荐 已保存数据", index_list.Title)
+			fmt.Println("已保存数据", index_list)
 			return
 		}
 
@@ -129,7 +129,6 @@ func GetFetchUrl(url string) {
 	})
 
 	close(chans)
-
 	wg.Add(6)
 	for i := 1; i <= 6; i++ {
 		CrwalInfo(chans, &wg)
