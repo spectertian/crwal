@@ -1,6 +1,7 @@
 package db
 
 import (
+	"bytes"
 	"context"
 	"crwal/model"
 	"crwal/util"
@@ -8,6 +9,12 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/gridfs"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"path"
 	"time"
 )
 
@@ -268,4 +275,66 @@ func SaveAndUpdateDownInfo(down_info *model.DownInfoStruct) string {
 		fmt.Println("更新下载信息", down_info.Title, time.Now().Format("2006-01-02 15:04:05"))
 		return ""
 	}
+}
+
+func UploadFile(body *[]byte, filename, contentType string) string {
+	bucket, err := gridfs.NewBucket(
+		client.Database("image"),
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	uploadOpts := options.GridFSUpload().
+		SetMetadata(bson.D{{"content-type", contentType}})
+
+	fileID, err := bucket.UploadFromStream(
+		filename,
+		bytes.NewBuffer(*body),
+		uploadOpts)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return fileID.Hex()
+}
+
+func IsHasFile(fileName string) string {
+	db := client.Database("image")
+	fsFiles := db.Collection("fs.files")
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	var results model.IndexHas
+	err := fsFiles.FindOne(ctx, bson.M{"filename": fileName}).Decode(&results)
+
+	// you can print out the results
+	if err == mongo.ErrNoDocuments {
+		return ""
+	}
+	if err != nil {
+		panic(err)
+	}
+	return results.ID.Hex()
+
+}
+
+func SaveImage(path_url string) string {
+	if path_url == "" {
+		return ""
+	}
+
+	file_name := path.Base(path_url)
+	file_id := IsHasFile(file_name)
+	if file_id != "" {
+		fmt.Println("has_file:", file_id)
+		return file_id
+	}
+	resp, _ := http.Get(path_url)
+	body, _ := ioutil.ReadAll(resp.Body)
+	contentType := http.DetectContentType(body)
+	fmt.Println(contentType)
+	insert_id := UploadFile(&body, file_name, contentType)
+	fmt.Println("插入", insert_id)
+	return insert_id
+
 }
