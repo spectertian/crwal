@@ -1,12 +1,11 @@
 package main
 
 import (
-	"context"
 	"crwal/db"
 	"crwal/model"
+	"crwal/util"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/chromedp/chromedp"
 	"log"
 	"net/http"
 	"regexp"
@@ -113,7 +112,7 @@ func CrwalInfo(chans chan model.Update, wg *sync.WaitGroup) {
 					dy.Url = update.Url
 					dy.LongTitle = update.Title
 					dy.CId = update.CId
-					dy_info := GetContentNewAll(&dy)
+					dy_info := util.GetContentNewAll(&dy)
 					info_id := db.SaveDy(&dy_info)
 
 					down_info := model.DownInfoStruct{}

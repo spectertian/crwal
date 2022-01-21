@@ -77,7 +77,10 @@ func GetContentNewAll(dy *model.Dy) model.Dy {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
 	if err != nil {
 		log.Fatal(err)
+		return *dy
 	}
+	dy.Status = 1
+
 	//fmt.Printf(dy.Url)
 	dy.DownStatus = 1
 	dy.UpdatedTime = time.Now()
