@@ -21,7 +21,7 @@ import (
 var client = util.GetMClient()
 
 func IsDyListOk(url string) string {
-	coll := client.Database("dy").Collection("lists")
+	coll := client.Database("dy").Collection("list")
 	var result model.Default
 	err := coll.FindOne(context.TODO(), bson.D{{"url", url}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
@@ -63,7 +63,7 @@ func IsHasIndexByUrl(url string, types string) string {
 }
 
 func IsDownOk(url string) int {
-	coll := client.Database("dy").Collection("lists")
+	coll := client.Database("dy").Collection("list")
 	var result model.Default
 	err := coll.FindOne(context.TODO(), bson.D{{"url", url}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
@@ -78,7 +78,7 @@ func IsDownOk(url string) int {
 
 func GetDyInfo(url string) model.Default {
 
-	coll := client.Database("dy").Collection("lists")
+	coll := client.Database("dy").Collection("list")
 	var result model.Default
 	err := coll.FindOne(context.TODO(), bson.D{{"url", url}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
@@ -228,7 +228,7 @@ func SaveIndexList(index_list *model.IndexListStruct) string {
 }
 
 func SaveDy(dy *model.Dy) string {
-	coll := client.Database("dy").Collection("lists")
+	coll := client.Database("dy").Collection("list")
 	var result model.Default
 	err := coll.FindOne(context.TODO(), bson.D{{"url", dy.Url}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
@@ -339,7 +339,7 @@ func SaveImage(path_url string) string {
 }
 
 func UpdateImagePic(id string, img_id string) {
-	coll := client.Database("dy").Collection("lists")
+	coll := client.Database("dy").Collection("list")
 	id_obj, _ := primitive.ObjectIDFromHex(id)
 	fmt.Println(bson.M{"_id": id_obj})
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)

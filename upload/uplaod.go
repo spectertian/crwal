@@ -16,7 +16,7 @@ func main() {
 
 	var client = util.GetMClient()
 
-	coll := client.Database("dy").Collection("lists")
+	coll := client.Database("dy").Collection("list")
 	cur, err := coll.Find(context.TODO(), bson.D{{}})
 	if err != nil {
 		fmt.Println(err)
