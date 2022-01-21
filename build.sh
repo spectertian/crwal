@@ -1,7 +1,7 @@
 #/bin/bash
 source /etc/profile
 echo $HOME
-
+go env -w GO111MODULE=auto
 
 cd -
 go build -o dy dy.go
