@@ -167,11 +167,11 @@ func CrwalInfo(chans chan model.IndexListStruct, wg *sync.WaitGroup) {
 					db.SaveAndUpdateDownInfo(&down_info)
 
 					index_list.InfoId = info_id
-					index_list.InfoId = dy_info.ProductionDate
+					index_list.ProductionDate = dy_info.ProductionDate
 					db.SaveIndexList(&index_list)
 				} else {
 					index_list.InfoId = info.ID.Hex()
-					index_list.DateTime = info.ProductionDate
+					index_list.ProductionDate = info.ProductionDate
 					db.SaveIndexList(&index_list)
 				}
 
