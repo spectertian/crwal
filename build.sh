@@ -2,6 +2,8 @@
 source /etc/profile
 echo $HOME
 go env -w GO111MODULE=auto
+export GOPROXY=https://goproxy.io
+
 
 cd -
 go build -o dy dy.go
