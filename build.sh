@@ -54,3 +54,13 @@ else
 	exit -1;
 fi
 
+cd $cur_dir
+cd fix
+go build -o fix fix.go
+if [ $? -eq 0 ]; then
+	echo "build fix ok!"
+else
+	echo "build fix false!"
+	exit -1;
+fi
+
