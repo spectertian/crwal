@@ -129,10 +129,27 @@ func GetContentNewAll(dy *model.Dy) model.Dy {
 	})
 	dy.Director = dirct
 
-	dy.Area = strings.TrimSpace(doc.Find(".director").Next().Find("span").Text())
-	dy.Year = strings.TrimSpace(doc.Find(".director").Next().Next().Find("span").Text())
-	dy.Language = strings.TrimSpace(doc.Find(".director").Next().Next().Next().Find("span").Text())
-	dy.RunTime = strings.TrimSpace(doc.Find(".director").Next().Next().Next().Next().Find("span").Text())
+	doc.Find(".director").NextUntilMatcher(goquery.Single(".text .tag ")).Each(func(i int, s *goquery.Selection) {
+		t_em := strings.TrimSpace(s.Find("em").Text())
+		if t_em == "地区" {
+			dy.Area = strings.TrimSpace(s.Find("span").Text())
+		}
+		if t_em == "年份" {
+			dy.Year = strings.TrimSpace(s.Find("span").Text())
+		}
+		if t_em == "语言" {
+			dy.Language = strings.TrimSpace(s.Find("span").Text())
+		}
+
+		if t_em == "更新" {
+			dy.UpdatedDate = strings.TrimSpace(s.Find("span").Text())
+		}
+
+		if t_em == "时长" {
+			dy.RunTime = strings.TrimSpace(s.Find("span").Text())
+		}
+
+	})
 
 	tags := []string{}
 	doc.Find(".text .tag a").Each(func(i int, s *goquery.Selection) {
