@@ -2,6 +2,7 @@ package main
 
 import (
 	"crwal/model"
+	"crwal/util"
 	"testing"
 )
 
@@ -17,7 +18,7 @@ func TestGetContentNewAll(t *testing.T) {
 	for _, v := range kk {
 		dy := &model.Dy{}
 		dy.Url = v
-		ss := GetContentNewAll(dy)
+		ss := util.GetContentNewAll(dy)
 		//t.Log(ss.Director)
 		//t.Log(ss.Stars)
 		// t.Log(ss.Title)

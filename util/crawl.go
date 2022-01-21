@@ -131,6 +131,8 @@ func GetContentNewAll(dy *model.Dy) model.Dy {
 
 	doc.Find(".director").NextUntilMatcher(goquery.Single(".text .tag ")).Each(func(i int, s *goquery.Selection) {
 		t_em := strings.TrimSpace(s.Find("em").Text())
+		t_em = strings.ReplaceAll(t_em, "：", "")
+		fmt.Println("######", t_em, "-------", s.Find("span").Text())
 		if t_em == "地区" {
 			dy.Area = strings.TrimSpace(s.Find("span").Text())
 		}
@@ -148,7 +150,6 @@ func GetContentNewAll(dy *model.Dy) model.Dy {
 		if t_em == "时长" {
 			dy.RunTime = strings.TrimSpace(s.Find("span").Text())
 		}
-
 	})
 
 	tags := []string{}
