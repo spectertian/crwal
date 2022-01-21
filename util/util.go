@@ -13,7 +13,8 @@ import (
 var MClient *mongo.Client
 
 func MInit() {
-	if err := godotenv.Load(); err != nil {
+	path_sour := "/www/craw.domp4.cc/.env"
+	if err := godotenv.Load(path_sour); err != nil {
 		log.Println("No .env file found")
 	}
 	uri := os.Getenv("MONGODB_URI")
