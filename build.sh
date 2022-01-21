@@ -1,12 +1,12 @@
 #/bin/bash
 source /etc/profile
 cur_dir=$(pwd)
-echo $(cur_dir)
+echo $cur_dir
 go env -w GO111MODULE=auto
 export GOPROXY=https://goproxy.io
 
 
-cd cur_dir
+cd $cur_dir
 ls -l
 go build -o dy dy.go
 if [ $? -eq 0 ]; then
@@ -25,7 +25,7 @@ else
 	exit -1;
 fi
 
-cd  cur_dir
+cd  $cur_dir
 cd news
 go build -o news news.go
 if [ $? -eq 0 ]; then
@@ -35,7 +35,7 @@ else
 	exit -1;
 fi
 
-cd cur_dir
+cd $cur_dir
 cd topic
 go build -o topic topic.go
 if [ $? -eq 0 ]; then
@@ -45,7 +45,7 @@ else
 	exit -1;
 fi
 
-cd cur_dir
+cd $cur_dir
 cd update
 go build -o update update.go
 if [ $? -eq 0 ]; then
