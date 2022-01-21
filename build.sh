@@ -7,6 +7,7 @@ export GOPROXY=https://goproxy.io
 
 
 cd cur_dir
+ls ls -l
 go build -o dy dy.go
 if [ $? -eq 0 ]; then
 	echo "build dy ok!"
