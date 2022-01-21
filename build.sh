@@ -1,6 +1,7 @@
 #/bin/bash
 source /etc/profile
-echo $HOME
+cur_dir=$(pwd)
+echo cur_dir
 go env -w GO111MODULE=auto
 export GOPROXY=https://goproxy.io
 
