@@ -44,7 +44,7 @@ func main() {
 		re_save.RunTime = all.RunTime
 		re_save.RunTime = all.RunTime
 
-		fmt.Println(elem.Title, dy.LongTitle, elem.Url)
+		fmt.Println(time.Now().Format("2006-01-02 15:04:05"), elem.Title, dy.LongTitle, elem.Url)
 		db.UpdateDy(elem.ID.Hex(), &re_save)
 		//os.Exit(1)
 	}
