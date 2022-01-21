@@ -16,7 +16,7 @@ type Default struct {
 	Area           string
 	Rating         string
 	Introduction   string
-	ProductionDate string
+	ProductionDate string `bson:"production_date"`
 }
 
 type UpdateHas struct {
@@ -143,13 +143,13 @@ type TopicListStruct struct {
 }
 
 type IndexListStruct struct {
-	Url         string
-	Type        string
-	Sort        int
-	InfoId      string `bson:"info_id"`
-	CId         string `bson:"c_id"`
-	Title       string
-	Date        string
-	DateTime    string    `bson:"date_time"`
-	CreatedTime time.Time `bson:"created_time"`
+	Url            string
+	Type           string
+	Sort           int
+	InfoId         string `bson:"info_id"`
+	CId            string `bson:"c_id"`
+	Title          string
+	Date           string
+	ProductionDate string    `bson:"production_date"`
+	CreatedTime    time.Time `bson:"created_time"`
 }
