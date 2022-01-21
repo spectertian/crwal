@@ -6,7 +6,7 @@ go env -w GO111MODULE=auto
 export GOPROXY=https://goproxy.io
 
 
-cd -
+cd cur_dir
 go build -o dy dy.go
 if [ $? -eq 0 ]; then
 	echo "build dy ok!"
@@ -15,7 +15,7 @@ else
 	exit -1;
 fi
 
-cd -
+cd cur_dir
 cd index
 go build -o index index.go
 if [ $? -eq 0 ]; then
@@ -25,8 +25,8 @@ else
 	exit -1;
 fi
 
-cd -
-cd news
+cd cur_dir
+cd index
 go build -o news news.go
 if [ $? -eq 0 ]; then
 	echo "build news ok!"
@@ -35,8 +35,8 @@ else
 	exit -1;
 fi
 
-cd -
-cd topic
+cd cur_dir
+cd index
 go build -o topic topic.go
 if [ $? -eq 0 ]; then
 	echo "build topic ok!"
@@ -45,8 +45,8 @@ else
 	exit -1;
 fi
 
-cd -
-cd update
+cd cur_dir
+cd index
 go build -o update update.go
 if [ $? -eq 0 ]; then
 	echo "build update ok!"
