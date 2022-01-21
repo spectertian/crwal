@@ -3,6 +3,7 @@ package main
 import (
 	"crwal/db"
 	"crwal/model"
+	"crwal/util"
 	"fmt"
 	"regexp"
 	"sync"
@@ -12,18 +13,11 @@ import (
 func TestMin(t *testing.T) {
 	main()
 }
-func TestGetContent(t *testing.T) {
-	dy := &model.Dy{}
-	dy.Url = "https://www.domp4.cc/html/7yt48T44444T.html"
-	//dy.Url = "https://www.domp4.cc//detail/12589.html"
-	ss := GetContent(dy)
-	t.Log(ss)
-}
 
 func TestGetContentNew(t *testing.T) {
 	dy := &model.Dy{}
 	dy.Url = "https://www.domp4.cc//html/7yt48T44444T.html"
-	ss := GetDwonUrlAndDoubanUrl(dy)
+	ss := util.GetDwonUrlAndDoubanUrl(dy)
 	t.Log(ss)
 }
 
@@ -38,7 +32,7 @@ func TestGetContentNewAll(t *testing.T) {
 	for _, v := range kk {
 		dy := &model.Dy{}
 		dy.Url = v
-		ss := GetContentNewAll(dy)
+		ss := util.GetContentNewAll(dy)
 		//t.Log(ss.Director)
 		//t.Log(ss.Stars)
 		// t.Log(ss.Title)
