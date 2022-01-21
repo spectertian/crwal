@@ -34,10 +34,10 @@ func IsDyListOk(url string) string {
 	return result.ID.Hex()
 }
 
-func IsHasNewsByUrl(url string) string {
+func IsHasNewsByUrl(url, title string) string {
 	coll := client.Database("dy").Collection("news")
 	var result model.UpdateHas
-	err := coll.FindOne(context.TODO(), bson.D{{"url", url}}).Decode(&result)
+	err := coll.FindOne(context.TODO(), bson.D{{"url", url}, {"title", title}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
 		return ""
 	}
@@ -48,10 +48,10 @@ func IsHasNewsByUrl(url string) string {
 	return result.ID.Hex()
 }
 
-func IsHasIndexByUrl(url string, types string) string {
+func IsHasIndexByUrl(url string, types string, title string) string {
 	coll := client.Database("dy").Collection("index_list")
 	var result model.IndexHas
-	err := coll.FindOne(context.TODO(), bson.D{{"url", url}, {"type", types}}).Decode(&result)
+	err := coll.FindOne(context.TODO(), bson.D{{"url", url}, {"type", types}, {"title", title}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
 		return ""
 	}
@@ -94,10 +94,11 @@ func GetDyInfo(url string) model.Default {
 
 }
 
-func IsHasUpdateByUrl(url string) string {
+func IsHasUpdateByUrl(url, title string) string {
 	coll := client.Database("dy").Collection("update")
 	var result model.UpdateHas
-	err := coll.FindOne(context.TODO(), bson.D{{"url", url}}).Decode(&result)
+	err := coll.FindOne(context.TODO(), bson.D{{"url", url}, {"title", title}}).Decode(&result)
+
 	if err == mongo.ErrNoDocuments {
 		return ""
 	}
@@ -138,28 +139,56 @@ func SaveUpdate(update *model.Update) string {
 			return ""
 		}
 	} else {
+
+		upS := model.UpUpdateStruct{}
+		upS.Title = upS.Title
+		upS.UpdatedTime = time.Now()
+		upS.ProductionDate = update.ProductionDate
+		upS.Date = update.Date
+		filter := bson.D{{"url", update.Url}}
+		updateS := bson.D{{"$set", upS}}
+		_, err := coll.UpdateMany(context.TODO(), filter, updateS)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("更新下载信息", update.Title, time.Now().Format("2006-01-02 15:04:05"))
+
 		fmt.Println("已存在", update.Title, time.Now().Format("2006-01-02 15:04:05"))
 		return ""
 	}
 }
 
-func SaveNews(update *model.NewsStruct) string {
+func SaveNews(news *model.NewsStruct) string {
 	coll := client.Database("dy").Collection("news")
 	var result bson.M
-	err := coll.FindOne(context.TODO(), bson.D{{"url", update.Url}}).Decode(&result)
+	err := coll.FindOne(context.TODO(), bson.D{{"url", news.Url}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
-		result, err := coll.InsertOne(context.TODO(), update)
+		result, err := coll.InsertOne(context.TODO(), news)
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println("新增", update.Title, time.Now().Format("2006-01-02 15:04:05"))
+		fmt.Println("新增", news.Title, time.Now().Format("2006-01-02 15:04:05"))
 		if oid, ok := result.InsertedID.(primitive.ObjectID); ok {
 			return oid.String()
 		} else {
 			return ""
 		}
 	} else {
-		fmt.Println("已存在", update.Title, time.Now().Format("2006-01-02 15:04:05"))
+
+		upS := model.UpNewsStruct{}
+		upS.Title = news.Title
+		upS.UpdatedTime = time.Now()
+		upS.ProductionDate = news.ProductionDate
+		upS.Date = news.Date
+		filter := bson.D{{"url", news.Url}}
+		update := bson.D{{"$set", upS}}
+		_, err := coll.UpdateMany(context.TODO(), filter, update)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("更新下载信息", news.Title, time.Now().Format("2006-01-02 15:04:05"))
+
+		fmt.Println("已存在", news.Title, time.Now().Format("2006-01-02 15:04:05"))
 		return ""
 	}
 }
@@ -223,6 +252,20 @@ func SaveIndexList(index_list *model.IndexListStruct) string {
 		}
 	} else {
 		fmt.Println("已存在", index_list.Title, time.Now().Format("2006-01-02 15:04:05"))
+
+		upS := model.UpdateIndexListStruct{}
+		upS.Title = index_list.Title
+		upS.UpdatedTime = time.Now()
+		upS.ProductionDate = index_list.ProductionDate
+		upS.Date = index_list.Date
+		filter := bson.D{{"url", index_list.Url}}
+		update := bson.D{{"$set", upS}}
+		_, err := coll.UpdateMany(context.TODO(), filter, update)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("更新下载信息", index_list.Title, time.Now().Format("2006-01-02 15:04:05"))
+
 		return ""
 	}
 }
@@ -244,6 +287,24 @@ func SaveDy(dy *model.Dy) string {
 		}
 	} else {
 		fmt.Println("已存在", dy.LongTitle, time.Now().Format("2006-01-02 15:04:05"))
+		dy.UpdatedTime = time.Now()
+
+		upS := model.UpdateDyStruct{}
+		upS.ProductionDate = dy.ProductionDate
+		upS.LongTitle = dy.LongTitle
+		upS.DownUrl = dy.DownUrl
+		upS.DownStatus = dy.DownStatus
+		upS.UpdatedTime = dy.UpdatedTime
+		upS.Rating = dy.Rating
+		upS.DoubanUrl = dy.DoubanUrl
+
+		filter := bson.D{{"url", dy.Url}}
+		update := bson.D{{"$set", upS}}
+		_, err := coll.UpdateMany(context.TODO(), filter, update)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("更新下载信息", dy.Title, time.Now().Format("2006-01-02 15:04:05"))
 		return result.ID.Hex()
 	}
 }
@@ -334,7 +395,7 @@ func SaveImage(path_url string) string {
 	contentType := http.DetectContentType(body)
 	fmt.Println(contentType)
 	insert_id := UploadFile(&body, file_name, contentType)
-	fmt.Println("插入", insert_id)
+	fmt.Println("插入图片", insert_id)
 	return insert_id
 }
 
@@ -353,9 +414,9 @@ func UpdateImagePic(id string, img_id string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(result)
-	fmt.Println(err)
-	fmt.Printf("Updated %v Documents!\n", result.ModifiedCount)
+	//fmt.Println(result)
+	//fmt.Println(err)
+	fmt.Printf("Updated pic %v Documents!\n", result.ModifiedCount)
 }
 
 func SaveImageById(id, pic_path string) {

@@ -22,8 +22,6 @@ func GetFetchUrl(crawl_url string) {
 	i := 1
 	for {
 		url := fmt.Sprintf(crawl_url, i)
-		news := model.NewsStruct{}
-		news.CreatedTime = time.Now()
 		res, err := http.Get(url)
 		if err != nil {
 			log.Fatal(err)
@@ -41,6 +39,9 @@ func GetFetchUrl(crawl_url string) {
 
 		fmt.Println("开始:", url, time.Now().Format("2006-01-02 15:04:05"))
 		doc.Find("#list_dy ul li").Each(func(i int, s *goquery.Selection) {
+			news := model.NewsStruct{}
+			news.CreatedTime = time.Now()
+			news.UpdatedTime = time.Now()
 			hrefs, _ := s.Find("a").Attr("href")
 			news.Title = strings.TrimSpace(s.Find(" a").Text())
 			news.Date = strings.TrimSpace(s.Find("span").Text())
@@ -54,7 +55,7 @@ func GetFetchUrl(crawl_url string) {
 				return
 			}
 
-			news_id := db.IsHasNewsByUrl(news.Url)
+			news_id := db.IsHasNewsByUrl(news.Url, news.Title)
 			if news_id != "" {
 				fmt.Println("已保存数据", news.Title)
 				return
@@ -112,9 +113,11 @@ func CrwalInfo(chans chan model.NewsStruct, wg *sync.WaitGroup) {
 					db.SaveAndUpdateDownInfo(&down_info)
 
 					news.InfoId = info_id
+					news.ProductionDate = dy.ProductionDate
 					db.SaveNews(&news)
 				} else {
 					news.InfoId = info.ID.Hex()
+					news.ProductionDate = info.ProductionDate
 					db.SaveNews(&news)
 				}
 

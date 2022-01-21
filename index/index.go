@@ -57,7 +57,7 @@ func GetFetchUrl(url string) {
 				fmt.Println("不存在url", index_list)
 				return
 			}
-			index_list_id := db.IsHasIndexByUrl(index_list.Url, index_list.Type)
+			index_list_id := db.IsHasIndexByUrl(index_list.Url, index_list.Type, index_list.Title)
 			if index_list_id != "" {
 				fmt.Println("已保存数据", index_list)
 				return
@@ -89,7 +89,7 @@ func GetFetchUrl(url string) {
 				fmt.Println("不存在url", index_list)
 				return
 			}
-			index_list_id := db.IsHasIndexByUrl(index_list.Url, index_list.Type)
+			index_list_id := db.IsHasIndexByUrl(index_list.Url, index_list.Type, index_list.Title)
 			if index_list_id != "" {
 				fmt.Println("已保存数据", index_list)
 				return
@@ -103,6 +103,7 @@ func GetFetchUrl(url string) {
 	doc.Find(".index_today ul").Find("li").Each(func(i int, s *goquery.Selection) {
 		index_list := model.IndexListStruct{}
 		index_list.CreatedTime = time.Now()
+		index_list.UpdatedTime = time.Now()
 		index_list.Type = "today_recommend"
 		index_list.Sort = i
 		hrefs, _ := s.Find("a").Attr("href")
@@ -116,7 +117,7 @@ func GetFetchUrl(url string) {
 			fmt.Println("今日推荐 不存在url", index_list)
 			return
 		}
-		index_list_id := db.IsHasIndexByUrl(index_list.Url, index_list.Type)
+		index_list_id := db.IsHasIndexByUrl(index_list.Url, index_list.Type, index_list.Title)
 		fmt.Println(index_list.Url)
 		if index_list_id != "" {
 			fmt.Println("已保存数据", index_list)

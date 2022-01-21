@@ -86,6 +86,16 @@ type Dy struct {
 	DownCount         int `bson:"down_count"`
 }
 
+type UpdateDyStruct struct {
+	LongTitle      string       `bson:"long_title"`
+	DownUrl        []DownStruct `bson:"down_url"`
+	DownStatus     int          `bson:"down_status"`
+	DoubanUrl      string       `bson:"douban_url"`
+	Rating         string
+	ProductionDate string    `bson:"production_date"`
+	UpdatedTime    time.Time `bson:"updated_time"`
+}
+
 type FDyStruct struct {
 	ID     primitive.ObjectID `bson:"_id" json:"id,omitempty"`
 	Url    string
@@ -97,22 +107,40 @@ type FDyStruct struct {
 }
 
 type Update struct {
-	Url         string
-	InfoId      string `bson:"info_id"`
-	CId         string `bson:"c_id"`
-	Title       string
-	Date        string
-	Type        string
-	CreatedTime time.Time `bson:"created_time"`
+	Url            string
+	InfoId         string `bson:"info_id"`
+	CId            string `bson:"c_id"`
+	Title          string
+	Date           string
+	Type           string
+	ProductionDate string    `bson:"production_date"`
+	CreatedTime    time.Time `bson:"created_time"`
+	UpdatedTime    time.Time `bson:"updated_time"`
+}
+
+type UpUpdateStruct struct {
+	Title          string
+	Date           string
+	ProductionDate string    `bson:"production_date"`
+	UpdatedTime    time.Time `bson:"updated_time"`
 }
 
 type NewsStruct struct {
-	Url         string
-	InfoId      string `bson:"info_id"`
-	CId         string `bson:"c_id"`
-	Title       string
-	Date        string
-	CreatedTime time.Time `bson:"created_time"`
+	Url            string
+	InfoId         string `bson:"info_id"`
+	CId            string `bson:"c_id"`
+	Title          string
+	Date           string
+	ProductionDate string    `bson:"production_date"`
+	CreatedTime    time.Time `bson:"created_time"`
+	UpdatedTime    time.Time `bson:"updated_time"`
+}
+
+type UpNewsStruct struct {
+	Title          string
+	Date           string
+	ProductionDate string    `bson:"production_date"`
+	UpdatedTime    time.Time `bson:"updated_time"`
 }
 
 type TopicStruct struct {
@@ -142,6 +170,12 @@ type TopicListStruct struct {
 	CreatedTime  time.Time `bson:"created_time"`
 }
 
+type UpdateIndexListStruct struct {
+	Title          string
+	Date           string
+	ProductionDate string    `bson:"production_date"`
+	UpdatedTime    time.Time `bson:"updated_time"`
+}
 type IndexListStruct struct {
 	Url            string
 	Type           string
@@ -152,4 +186,5 @@ type IndexListStruct struct {
 	Date           string
 	ProductionDate string    `bson:"production_date"`
 	CreatedTime    time.Time `bson:"created_time"`
+	UpdatedTime    time.Time `bson:"updated_time"`
 }

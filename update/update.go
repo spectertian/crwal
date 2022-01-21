@@ -41,6 +41,7 @@ func GetFetchUrl(url string) {
 		update := model.Update{}
 		update.Type = "电影"
 		update.CreatedTime = time.Now()
+		update.UpdatedTime = time.Now()
 		update.Date = strings.TrimSpace(s.Find("b").Text())
 		update.Title = strings.TrimSpace(s.Find("a").Text())
 		update.Url = domin + strings.TrimSpace(hrefs)
@@ -53,7 +54,7 @@ func GetFetchUrl(url string) {
 			return
 		}
 
-		hasId := db.IsHasUpdateByUrl(update.Url)
+		hasId := db.IsHasUpdateByUrl(update.Url, update.Title)
 		if hasId != "" {
 			fmt.Println("已保存数据", update.Title)
 			return
@@ -67,6 +68,7 @@ func GetFetchUrl(url string) {
 		update := model.Update{}
 		update.Type = "电视剧"
 		update.CreatedTime = time.Now()
+		update.UpdatedTime = time.Now()
 		hrefs, _ := s.Find("a").Attr("href")
 		update.Date = strings.TrimSpace(s.Find("b").Text())
 		update.Title = strings.TrimSpace(s.Find("a").Text())
@@ -81,7 +83,7 @@ func GetFetchUrl(url string) {
 			return
 		}
 
-		hasId := db.IsHasUpdateByUrl(update.Url)
+		hasId := db.IsHasUpdateByUrl(update.Url, update.Title)
 		if hasId != "" {
 			fmt.Println("已保存数据", update.Title)
 			return
@@ -130,9 +132,11 @@ func CrwalInfo(chans chan model.Update, wg *sync.WaitGroup) {
 					db.SaveAndUpdateDownInfo(&down_info)
 
 					update.InfoId = info_id
+					update.ProductionDate = dy.ProductionDate
 					db.SaveUpdate(&update)
 				} else {
 					update.InfoId = info.ID.Hex()
+					update.ProductionDate = info.ProductionDate
 					db.SaveUpdate(&update)
 				}
 
