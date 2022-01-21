@@ -97,6 +97,8 @@ func CrwalInfo(chans chan model.NewsStruct, wg *sync.WaitGroup) {
 					dy_info := util.GetContentNewAll(&dy)
 					info_id := db.SaveDy(&dy_info)
 
+					db.SaveImageById(info_id, dy.Pic)
+
 					down_info := model.DownInfoStruct{}
 					down_info.DownUrl = dy.DownUrl
 					down_info.Url = dy.Url
