@@ -1,7 +1,7 @@
 #/bin/bash
 source /etc/profile
 cur_dir=$(pwd)
-echo cur_dir
+echo $(cur_dir)
 go env -w GO111MODULE=auto
 export GOPROXY=https://goproxy.io
 
@@ -26,7 +26,7 @@ else
 	exit -1;
 fi
 
-cd cur_dir
+cd
 cd index
 go build -o news news.go
 if [ $? -eq 0 ]; then
