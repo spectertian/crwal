@@ -336,5 +336,29 @@ func SaveImage(path_url string) string {
 	insert_id := UploadFile(&body, file_name, contentType)
 	fmt.Println("插入", insert_id)
 	return insert_id
+}
 
+func UpdateImagePic(id string, img_id string) {
+	coll := client.Database("dy").Collection("lists")
+	id_obj, _ := primitive.ObjectIDFromHex(id)
+	fmt.Println(bson.M{"_id": id_obj})
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	result, err := coll.UpdateOne(
+		ctx,
+		bson.M{"_id": id_obj},
+		bson.D{
+			{"$set", bson.D{{"img_url", img_id}}},
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(result)
+	fmt.Println(err)
+	fmt.Printf("Updated %v Documents!\n", result.ModifiedCount)
+}
+
+func SaveImageById(id, pic_path string) {
+	img_id := SaveImage(pic_path)
+	UpdateImagePic(id, img_id)
 }

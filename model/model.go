@@ -85,6 +85,16 @@ type Dy struct {
 	DownCount         int `bson:"down_count"`
 }
 
+type FDyStruct struct {
+	ID     primitive.ObjectID `bson:"_id" json:"id,omitempty"`
+	Url    string
+	CId    string `bson:"c_id"`
+	RId    string `bson:"r_id"`
+	Title  string
+	Pic    string
+	imgUrl string `bson:"img_url"`
+}
+
 type Update struct {
 	Url         string
 	InfoId      string `bson:"info_id"`
