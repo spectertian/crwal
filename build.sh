@@ -16,7 +16,6 @@ else
 	exit -1;
 fi
 
-cd cur_dir
 cd index
 go build -o index index.go
 if [ $? -eq 0 ]; then
@@ -26,8 +25,8 @@ else
 	exit -1;
 fi
 
-cd
-cd index
+cd  cur_dir
+cd news
 go build -o news news.go
 if [ $? -eq 0 ]; then
 	echo "build news ok!"
@@ -37,7 +36,7 @@ else
 fi
 
 cd cur_dir
-cd index
+cd topic
 go build -o topic topic.go
 if [ $? -eq 0 ]; then
 	echo "build topic ok!"
@@ -47,7 +46,7 @@ else
 fi
 
 cd cur_dir
-cd index
+cd update
 go build -o update update.go
 if [ $? -eq 0 ]; then
 	echo "build update ok!"
