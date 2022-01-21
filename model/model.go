@@ -86,6 +86,17 @@ type Dy struct {
 	DownCount         int `bson:"down_count"`
 }
 
+type UpDyStruct struct {
+	LongTitle   string    `bson:"long_title"`
+	UpdatedDate string    `bson:"updated_date"`
+	UpdatedTime time.Time `bson:"updated_time"`
+	DoubanUrl   string    `bson:"douban_url"`
+	Year        string
+	Area        string
+	RunTime     string `bson:"run_time"`
+	Language    string
+}
+
 type UpdateDyStruct struct {
 	LongTitle      string       `bson:"long_title"`
 	DownUrl        []DownStruct `bson:"down_url"`

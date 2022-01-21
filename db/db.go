@@ -309,6 +309,24 @@ func SaveDy(dy *model.Dy) string {
 	}
 }
 
+func UpdateDy(id string, dy *model.UpDyStruct) {
+	coll := client.Database("dy").Collection("list")
+	id_obj, _ := primitive.ObjectIDFromHex(id)
+	fmt.Println(bson.M{"_id": id_obj})
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	result, err := coll.UpdateOne(
+		ctx,
+		bson.M{"_id": id_obj},
+		bson.D{
+			{"$set", dy},
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Updated pic %v Documents!\n", result.ModifiedCount)
+}
+
 func SaveAndUpdateDownInfo(down_info *model.DownInfoStruct) string {
 	coll := client.Database("dy").Collection("down_info")
 	var result bson.M
