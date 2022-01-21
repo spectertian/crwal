@@ -6,16 +6,17 @@ import (
 )
 
 type Default struct {
-	ID           primitive.ObjectID `bson:"_id" json:"id,omitempty"`
-	DownStatus   int                `bson:"down_status"`
-	LongTitle    string             `bson:"long_title"`
-	Pic          string
-	imgUrl       string `bson:"img_url"`
-	Director     []string
-	Stars        []string
-	Area         string
-	Rating       string
-	Introduction string
+	ID             primitive.ObjectID `bson:"_id" json:"id,omitempty"`
+	DownStatus     int                `bson:"down_status"`
+	LongTitle      string             `bson:"long_title"`
+	Pic            string
+	imgUrl         string `bson:"img_url"`
+	Director       []string
+	Stars          []string
+	Area           string
+	Rating         string
+	Introduction   string
+	ProductionDate string
 }
 
 type UpdateHas struct {
@@ -149,5 +150,6 @@ type IndexListStruct struct {
 	CId         string `bson:"c_id"`
 	Title       string
 	Date        string
+	DateTime    string    `bson:"date_time"`
 	CreatedTime time.Time `bson:"created_time"`
 }
