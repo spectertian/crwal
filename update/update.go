@@ -133,10 +133,12 @@ func CrwalInfo(chans chan model.Update, wg *sync.WaitGroup) {
 
 					update.InfoId = info_id
 					update.ProductionDate = dy.ProductionDate
+					update.Title = dy.LongTitle
 					db.SaveUpdate(&update)
 				} else {
 					update.InfoId = info.ID.Hex()
 					update.ProductionDate = info.ProductionDate
+					update.Title = info.LongTitle
 					db.SaveUpdate(&update)
 				}
 
