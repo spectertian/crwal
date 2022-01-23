@@ -9,6 +9,7 @@ import (
 
 func main() {
 	var id = flag.String("id", "", "wiki id")
+	flag.Parse()
 	fmt.Println("id:", *id)
 	if *id == "" {
 		fmt.Println("id 不能为空")
