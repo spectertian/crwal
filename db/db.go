@@ -91,7 +91,6 @@ func GetDyInfo(url string) model.Default {
 	}
 
 	return result
-
 }
 
 func IsHasUpdateByUrl(url, title string) string {
@@ -440,4 +439,23 @@ func UpdateImagePic(id string, img_id string) {
 func SaveImageById(id, pic_path string) {
 	img_id := SaveImage(pic_path)
 	UpdateImagePic(id, img_id)
+}
+
+func GetDyInfoById(id string) model.Default {
+	coll := client.Database("dy").Collection("list")
+	id_obj, _ := primitive.ObjectIDFromHex(id)
+
+	var result model.Default
+	err := coll.FindOne(context.TODO(), bson.M{"_id": id_obj}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		ss := model.Default{}
+		ss.DownStatus = 8
+		return ss
+	}
+	if err != nil {
+		panic(err)
+	}
+
+	return result
+
 }

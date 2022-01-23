@@ -64,3 +64,13 @@ else
 	exit -1;
 fi
 
+cd $cur_dir
+cd tool
+go build -o tool tool.go
+if [ $? -eq 0 ]; then
+	echo "build tool ok!"
+else
+	echo "build tool false!"
+	exit -1;
+fi
+
