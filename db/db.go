@@ -257,7 +257,7 @@ func SaveIndexList(index_list *model.IndexListStruct) string {
 		upS.UpdatedTime = time.Now()
 		upS.ProductionDate = index_list.ProductionDate
 		upS.Date = index_list.Date
-		filter := bson.D{{"url", index_list.Url}}
+		filter := bson.D{{"url", index_list.Url}, {"type", index_list.Type}}
 		update := bson.D{{"$set", upS}}
 		_, err := coll.UpdateMany(context.TODO(), filter, update)
 		if err != nil {
