@@ -140,7 +140,7 @@ func SaveUpdate(update *model.Update) string {
 	} else {
 
 		upS := model.UpUpdateStruct{}
-		upS.Title = upS.Title
+		upS.Title = update.Title
 		upS.UpdatedTime = time.Now()
 		upS.ProductionDate = update.ProductionDate
 		upS.Date = update.Date
