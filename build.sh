@@ -74,3 +74,14 @@ else
 	exit -1;
 fi
 
+
+cd $cur_dir
+cd import_image
+go build -o importImage importImage.go
+if [ $? -eq 0 ]; then
+	echo "build importImage ok!"
+else
+	echo "build importImage false!"
+	exit -1;
+fi
+
