@@ -429,7 +429,7 @@ func SaveLocalImage(path_url string) string {
 		return file_id
 	}
 
-	resp, err := os.Open("D:/gopath/src/golang_development_notes/example/log.txt")
+	resp, err := os.Open(path_url)
 	if err != nil {
 		panic(err)
 	}
