@@ -14,6 +14,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"path"
 	"time"
 )
@@ -409,6 +410,31 @@ func SaveImage(path_url string) string {
 	}
 	resp, _ := http.Get(path_url)
 	body, _ := ioutil.ReadAll(resp.Body)
+	contentType := http.DetectContentType(body)
+	fmt.Println(contentType)
+	insert_id := UploadFile(&body, file_name, contentType)
+	fmt.Println("插入图片", insert_id)
+	return insert_id
+}
+
+func SaveLocalImage(path_url string) string {
+	if path_url == "" {
+		return ""
+	}
+
+	file_name := path.Base(path_url)
+	file_id := IsHasFile(file_name)
+	if file_id != "" {
+		fmt.Println("has_file:", file_id)
+		return file_id
+	}
+
+	resp, err := os.Open("D:/gopath/src/golang_development_notes/example/log.txt")
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Close()
+	body, _ := ioutil.ReadAll(resp)
 	contentType := http.DetectContentType(body)
 	fmt.Println(contentType)
 	insert_id := UploadFile(&body, file_name, contentType)

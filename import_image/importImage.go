@@ -20,7 +20,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	id := db.SaveImage(*path)
+	id := db.SaveLocalImage(*path)
 	fmt.Println("mongo gridfs id: ", id)
 
 	fmt.Println("end import image", time.Now().Format("2006-01-02 15:04:05"))
