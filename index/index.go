@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-var domin = "https://www.domp4.cc"
+var domin = "https://www.domp4.cc/"
 var wg sync.WaitGroup
 
 func GetFetchUrl(url string) {
