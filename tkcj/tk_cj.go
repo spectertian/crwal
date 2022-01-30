@@ -89,6 +89,7 @@ func GetInfo(url string) {
 			urls := Domin + hrefs
 			pageDate := strings.TrimSpace(s.Find("span[class=xing_vb7]").Text())
 			has := db.IsHasTKCrawl(urls, pageDate)
+			fmt.Println("GetDetailByUrl", urls)
 			if has == "" {
 				saves := GetDetailByUrl(urls)
 				fmt.Println("info", saves)
