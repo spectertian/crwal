@@ -81,6 +81,7 @@ func GetInfo(url string) {
 		log.Fatal(err)
 	}
 
+	fmt.Println("url", url)
 	doc.Find(".xing_vb ul").Each(func(i int, s *goquery.Selection) {
 		if s.Find("span").HasClass("tt") {
 			href, _ := s.Find("a").Attr("href")
