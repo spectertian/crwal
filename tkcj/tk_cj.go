@@ -66,6 +66,9 @@ forEnd:
 }
 
 func GetInfo(url string) {
+	if url == "" {
+		return
+	}
 	res, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
