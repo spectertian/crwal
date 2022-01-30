@@ -91,6 +91,7 @@ func GetInfo(url string) {
 			has := db.IsHasTKCrawl(urls, pageDate)
 			if has == "" {
 				saves := GetDetailByUrl(urls)
+				fmt.Println("info", saves)
 				SaveInfo(&saves)
 			} else {
 				fmt.Println("已存在跳过")
