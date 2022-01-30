@@ -58,7 +58,7 @@ func CrawlInfo(TChannel *chan string, wg *sync.WaitGroup) {
 				fmt.Println("退出", time.Now().Format("2006-01-02 15:04:05"))
 				goto forEnd
 			}
-		case <-time.After(time.Millisecond * 500):
+		case <-time.After(time.Millisecond * 650):
 			fmt.Println("0.5 >>>>>")
 		}
 
