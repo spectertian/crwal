@@ -108,9 +108,16 @@ func GetInfo(url string) {
 
 func SaveInfo(dy *model.TKStruct) {
 	if dy == nil {
+
+		fmt.Println("dy为空", dy)
 		return
 	}
 	dy_id := db.SaveTkDy(dy)
+
+	if dy_id == "" {
+		fmt.Println("dy_id为空", dy, dy_id)
+		return
+	}
 	db.SaveTKImageById(dy_id, dy.Pic)
 }
 
