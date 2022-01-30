@@ -58,7 +58,10 @@ func CrawlInfo(TChannel *chan string, wg *sync.WaitGroup) {
 				fmt.Println("退出", time.Now().Format("2006-01-02 15:04:05"))
 				goto forEnd
 			}
+		case <-time.After(time.Millisecond * 500):
+			fmt.Println("0.5 >>>>>")
 		}
+
 	}
 forEnd:
 	return
@@ -95,7 +98,6 @@ func GetInfo(url string) {
 			fmt.Println("GetDetailByUrl", urls)
 			if has == "" {
 				saves := GetDetailByUrl(urls)
-				fmt.Println("info", saves)
 				SaveInfo(&saves)
 			} else {
 				fmt.Println("已存在跳过")
