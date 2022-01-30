@@ -107,6 +107,9 @@ func GetInfo(url string) {
 }
 
 func SaveInfo(dy *model.TKStruct) {
+	if dy == nil {
+		return
+	}
 	dy_id := db.SaveTkDy(dy)
 	db.SaveTKImageById(dy_id, dy.Pic)
 }
