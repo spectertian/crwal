@@ -85,3 +85,14 @@ else
 	exit -1;
 fi
 
+
+cd $cur_dir
+cd tkcj
+go build -o tk_cj tk_cj.go
+if [ $? -eq 0 ]; then
+	echo "build tk_cj ok!"
+else
+	echo "build tk_cj false!"
+	exit -1;
+fi
+
