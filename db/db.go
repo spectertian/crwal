@@ -485,3 +485,130 @@ func GetDyInfoById(id string) model.Default {
 	return result
 
 }
+
+func GetBDInfo(url string) model.Default {
+
+	coll := client.Database("dy").Collection("bd_list")
+	var result model.Default
+	err := coll.FindOne(context.TODO(), bson.D{{"url", url}}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		ss := model.Default{}
+		ss.DownStatus = 8
+		return ss
+	}
+	if err != nil {
+		panic(err)
+	}
+
+	return result
+}
+
+func SaveBDDy(dy *model.BZYStruct) string {
+	coll := client.Database("dy").Collection("list")
+	var result model.Default
+	err := coll.FindOne(context.TODO(), bson.D{{"url", dy.Url}}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		result, err := coll.InsertOne(context.TODO(), dy)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("新增", dy.LongTitle, time.Now().Format("2006-01-02 15:04:05"))
+		if oid, ok := result.InsertedID.(primitive.ObjectID); ok {
+			return oid.Hex()
+		} else {
+			return ""
+		}
+	} else {
+		fmt.Println("已存在", dy.LongTitle, time.Now().Format("2006-01-02 15:04:05"))
+		dy.UpdatedTime = time.Now()
+
+		upS := model.UpdateDyStruct{}
+		upS.ProductionDate = dy.ProductionDate
+		upS.LongTitle = dy.LongTitle
+		upS.DownUrl = dy.DownUrl
+		upS.DownStatus = dy.DownStatus
+		upS.UpdatedTime = dy.UpdatedTime
+		upS.Rating = dy.Rating
+		upS.DoubanUrl = dy.DoubanUrl
+
+		filter := bson.D{{"url", dy.Url}}
+		update := bson.D{{"$set", upS}}
+		_, err := coll.UpdateMany(context.TODO(), filter, update)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("更新下载信息", dy.Title, time.Now().Format("2006-01-02 15:04:05"))
+		return result.ID.Hex()
+	}
+}
+
+func SaveTkDy(dy *model.TKStruct) string {
+	coll := client.Database("dy").Collection("tk_list")
+	var result model.Default
+	err := coll.FindOne(context.TODO(), bson.D{{"url", dy.Url}}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		result, err := coll.InsertOne(context.TODO(), dy)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("新增", dy.LongTitle, time.Now().Format("2006-01-02 15:04:05"))
+		if oid, ok := result.InsertedID.(primitive.ObjectID); ok {
+			return oid.Hex()
+		} else {
+			return ""
+		}
+	} else {
+		tk_up := model.TKUpdateStruct{}
+		tk_up.UpdatedTime = time.Now()
+		tk_up.Play = dy.Play
+		tk_up.EmTitle = dy.EmTitle
+		tk_up.DoubanId = dy.DoubanId
+		filter := bson.D{{"url", dy.Url}}
+		update := bson.D{{"$set", tk_up}}
+		_, err := coll.UpdateOne(context.TODO(), filter, update)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("更新下载信息", dy.Title, time.Now().Format("2006-01-02 15:04:05"))
+		return result.ID.Hex()
+	}
+}
+
+func IsHasTKCrawl(url, date string) string {
+	coll := client.Database("dy").Collection("tk_list")
+	var result model.UpdateHas
+	err := coll.FindOne(context.TODO(), bson.D{{"url", url}, {"page_date", date}}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		return ""
+	}
+	if err != nil {
+		panic(err)
+	}
+
+	return result.ID.Hex()
+}
+
+func SaveTKImageById(id, pic_path string) {
+	img_id := SaveImage(pic_path)
+	UpdateImagePic(id, img_id)
+}
+
+func SaveTKImage(path_url string) string {
+	if path_url == "" {
+		return ""
+	}
+
+	file_name := "tk_" + path.Base(path_url)
+	file_id := IsHasFile(file_name)
+	if file_id != "" {
+		fmt.Println("has_file:", file_id)
+		return file_id
+	}
+	resp, _ := http.Get(path_url)
+	body, _ := ioutil.ReadAll(resp.Body)
+	contentType := http.DetectContentType(body)
+	fmt.Println(contentType)
+	insert_id := UploadFile(&body, file_name, contentType)
+	fmt.Println("插入图片", insert_id)
+	return insert_id
+}
