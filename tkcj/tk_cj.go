@@ -97,7 +97,7 @@ func GetInfo(url string) {
 			has := db.IsHasTKCrawl(urls, pageDate)
 			fmt.Println("GetDetailByUrl", urls)
 			if has == "" {
-				saves := GetDetailByUrl(urls)
+				saves := GetDetailByUrl(urls, 0)
 				SaveInfo(&saves)
 			} else {
 				fmt.Println("已存在跳过")
@@ -123,7 +123,8 @@ func SaveInfo(dy *model.TKStruct) {
 	db.SaveTKImageById(dy_id, dy.Pic)
 }
 
-func GetDetailByUrl(url string) model.TKStruct {
+func GetDetailByUrl(url string, c_count int) model.TKStruct {
+forStart:
 	res, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
@@ -132,6 +133,9 @@ func GetDetailByUrl(url string) model.TKStruct {
 	res.Header.Add("Connection", "close")
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
+		c_count = c_count + 1
+		fmt.Println("抓取次数：", c_count, "----", url)
+		goto forStart
 		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
 	}
 	doc, err := goquery.NewDocumentFromReader(res.Body)
