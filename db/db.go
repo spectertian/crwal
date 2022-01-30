@@ -605,8 +605,6 @@ func SaveTKImage(path_url string) string {
 		return file_id
 	}
 	resp, _ := http.Get(path_url)
-	fmt.Println("Body", resp.Body)
-	fmt.Println("Body2", path_url, file_name)
 	body, _ := ioutil.ReadAll(resp.Body)
 	contentType := http.DetectContentType(body)
 	fmt.Println(contentType)
