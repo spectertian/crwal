@@ -134,6 +134,7 @@ forStart:
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
 		c_count = c_count + 1
+		time.Sleep(time.Second * 1)
 		fmt.Println("抓取次数：", c_count, "----", url)
 		goto forStart
 		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
