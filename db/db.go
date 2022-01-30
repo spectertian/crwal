@@ -589,7 +589,7 @@ func IsHasTKCrawl(url, date string) string {
 }
 
 func SaveTKImageById(id, pic_path string) {
-	img_id := SaveImage(pic_path)
+	img_id := SaveTKImage(pic_path)
 	UpdateImagePic(id, img_id)
 }
 
