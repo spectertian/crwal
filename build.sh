@@ -98,7 +98,7 @@ fi
 
 cd $cur_dir
 cd upload_tk
-go build -o upload upload.go
+go build -o upload_tk upload_tk.go
 if [ $? -eq 0 ]; then
 	echo "build upload_tk ok!"
 else
