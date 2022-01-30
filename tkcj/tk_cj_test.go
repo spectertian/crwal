@@ -40,7 +40,7 @@ func TestGetDetailByUrl(t *testing.T) {
 		"https://www.tiankongzy.com/index.php/vod/detail/id/61655.html",
 	}
 	for _, url := range list {
-		ss := GetDetailByUrl(url)
+		ss := GetDetailByUrl(url, 0)
 		fmt.Println(ss)
 	}
 

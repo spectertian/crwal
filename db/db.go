@@ -462,6 +462,26 @@ func UpdateImagePic(id string, img_id string) {
 	fmt.Printf("Updated pic %v Documents!\n", result.ModifiedCount)
 }
 
+func UpdateTKImagePic(id string, img_id string) {
+	coll := client.Database("dy").Collection("tk_list")
+	id_obj, _ := primitive.ObjectIDFromHex(id)
+	fmt.Println(bson.M{"_id": id_obj})
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	result, err := coll.UpdateOne(
+		ctx,
+		bson.M{"_id": id_obj},
+		bson.D{
+			{"$set", bson.D{{"img_url", img_id}}},
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	//fmt.Println(result)
+	//fmt.Println(err)
+	fmt.Printf("Updated pic %v Documents!\n", result.ModifiedCount)
+}
+
 func SaveImageById(id, pic_path string) {
 	img_id := SaveImage(pic_path)
 	UpdateImagePic(id, img_id)
@@ -590,7 +610,7 @@ func IsHasTKCrawl(url, date string) string {
 
 func SaveTKImageById(id, pic_path string) {
 	img_id := SaveTKImage(pic_path)
-	UpdateImagePic(id, img_id)
+	UpdateTKImagePic(id, img_id)
 }
 
 func SaveTKImage(path_url string) string {
