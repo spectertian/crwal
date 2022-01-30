@@ -96,3 +96,13 @@ else
 	exit -1;
 fi
 
+cd $cur_dir
+cd upload_tk
+go build -o upload upload.go
+if [ $? -eq 0 ]; then
+	echo "build upload_tk ok!"
+else
+	echo "build upload_tk false!"
+	exit -1;
+fi
+
