@@ -167,7 +167,7 @@ forStart:
 	tk.Year = strings.TrimSpace(doc.Find(".vodinfobox li").Eq(6).Find("span").Text())
 	tk.PageDate = strings.TrimSpace(doc.Find(".vodinfobox li").Eq(7).Find("span").Text())
 	tk.DoubanId = strings.TrimSpace(doc.Find(".vodinfobox li").Eq(8).Find("span").Text())
-	tk.Introduction = strings.TrimSpace(doc.Find("vodplayinfo").Eq(0).Text())
+	tk.Introduction = strings.TrimSpace(doc.Find(".vodplayinfo").Eq(0).Text())
 
 	doc.Find(".vodplayinfo").Eq(1).Find("ul").Each(func(i int, s *goquery.Selection) {
 		plays := model.TKLStruct{}

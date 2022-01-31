@@ -36,7 +36,7 @@ func TestSetPageCounts(t *testing.T) {
 func TestGetDetailByUrl(t *testing.T) {
 
 	list := []string{
-		"https://www.tiankongzy.com/index.php/vod/detail/id/61698.html",
+		//"https://www.tiankongzy.com/index.php/vod/detail/id/61698.html",
 		"https://www.tiankongzy.com/index.php/vod/detail/id/61655.html",
 	}
 	for _, url := range list {
