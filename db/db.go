@@ -632,3 +632,21 @@ func SaveTKImage(path_url string) string {
 	fmt.Println("插入图片", insert_id)
 	return insert_id
 }
+func UpdateTkDy(id string, tk_up *model.TKUpdateIntroductionStruct) {
+	coll := client.Database("dy").Collection("tk_list")
+	id_obj, _ := primitive.ObjectIDFromHex(id)
+	fmt.Println(bson.M{"_id": id_obj})
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+
+	result, err := coll.UpdateOne(
+		ctx,
+		bson.M{"_id": id_obj},
+		bson.D{
+			{"$set", tk_up},
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Updated introduction %v Documents!\n", result.ModifiedCount)
+}

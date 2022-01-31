@@ -106,3 +106,13 @@ else
 	exit -1;
 fi
 
+cd $cur_dir
+cd fix_tk_desc
+go build -o fix_tk_desc fix_tk_desc.go
+if [ $? -eq 0 ]; then
+	echo "build fix_tk_desc ok!"
+else
+	echo "build fix_tk_desc false!"
+	exit -1;
+fi
+

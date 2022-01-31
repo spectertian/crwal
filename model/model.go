@@ -291,3 +291,7 @@ type TKUpdateStruct struct {
 	DoubanId    string    `bson:"douban_id"`
 	Play        []TKLStruct
 }
+
+type TKUpdateIntroductionStruct struct {
+	Introduction string
+}
