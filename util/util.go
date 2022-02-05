@@ -8,12 +8,19 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"os"
+	"runtime"
 )
 
 var MClient *mongo.Client
 
 func MInit() {
+
+	sysType := runtime.GOOS
 	path_sour := "/www/craw.domp4.cc/.env"
+	if sysType != "linux" {
+		path_sour = ".env"
+	}
+
 	//path_sour := ".env"
 	if err := godotenv.Load(path_sour); err != nil {
 		log.Println("No .env file found")
