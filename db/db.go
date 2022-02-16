@@ -650,3 +650,190 @@ func UpdateTkDy(id string, tk_up *model.TKUpdateIntroductionStruct) {
 	}
 	fmt.Printf("Updated introduction %v Documents!\n", result.ModifiedCount)
 }
+
+func SaveAndUpdateWj(wj_vod *model.WJVod) string {
+	coll := client.Database("dy").Collection("vod_wj_list")
+	var result model.VodIndexHas
+
+	err := coll.FindOne(context.TODO(), bson.D{{"vod_id", wj_vod.VodId}}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+
+		wj_vod.UpdatedTime = time.Now()
+		wj_vod.CreatedTime = time.Now()
+		results, err := coll.InsertOne(context.TODO(), wj_vod)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("新增wj信息", wj_vod.VodName, time.Now().Format("2006-01-02 15:04:05"))
+
+		if oid, ok := results.InsertedID.(primitive.ObjectID); ok {
+			return oid.Hex()
+		} else {
+			return ""
+		}
+	} else {
+		wj_vod.UpdatedTime = time.Now()
+		if result.VodDoubanId > 0 {
+			wj_vod.VodDoubanId = result.VodDoubanId
+		}
+		filter := bson.D{{"vod_id", wj_vod.VodId}}
+		update := bson.D{{"$set", wj_vod}}
+		_, err := coll.UpdateOne(context.TODO(), filter, update)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("更新wj信息", wj_vod.VodName, time.Now().Format("2006-01-02 15:04:05"))
+	}
+
+	return result.ID.Hex()
+}
+
+func SaveVodImageById(id, pic_path string, tag string) {
+	img_id := SaveVodImage(pic_path, tag)
+	UpdateVodImagePic(id, img_id)
+}
+
+func SaveVodImage(path_url string, tag string) string {
+	if path_url == "" {
+		return ""
+	}
+
+	file_name := tag + path.Base(path_url)
+	file_id := IsHasFile(file_name)
+	if file_id != "" {
+		fmt.Println("has_file:", file_id)
+		return file_id
+	}
+	resp, _ := http.Get(path_url)
+	body, _ := ioutil.ReadAll(resp.Body)
+	contentType := http.DetectContentType(body)
+	fmt.Println(contentType)
+	insert_id := UploadFile(&body, file_name, contentType)
+	fmt.Println("插入图片", insert_id)
+	return insert_id
+}
+
+func UpdateVodImagePic(id string, img_id string) {
+	coll := client.Database("dy").Collection("vod_wj_list")
+	id_obj, _ := primitive.ObjectIDFromHex(id)
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	result, err := coll.UpdateOne(
+		ctx,
+		bson.M{"_id": id_obj},
+		bson.D{
+			{"$set", bson.D{{"img_url", img_id}}},
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	//fmt.Println(result)
+	//fmt.Println(err)
+	fmt.Printf("Updated pic %v Documents!\n", result.ModifiedCount)
+}
+
+func SaveWiki(wiki_info *model.Wiki) string {
+	coll := client.Database("dy").Collection("wiki")
+	var result model.WikiIndexHas
+
+	err := coll.FindOne(context.TODO(), bson.D{{"wiki_id", wiki_info.WikiId}}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		results, err := coll.InsertOne(context.TODO(), wiki_info)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("新增wiki信息", wiki_info.Title, time.Now().Format("2006-01-02 15:04:05"))
+
+		if oid, ok := results.InsertedID.(primitive.ObjectID); ok {
+			return oid.Hex()
+		} else {
+			return ""
+		}
+	}
+
+	return result.ID.Hex()
+}
+
+func IsHasWiki(id int) string {
+	coll := client.Database("dy").Collection("wiki")
+	var result model.WikiIndexHas
+	err := coll.FindOne(context.TODO(), bson.D{{"wiki_id", id}}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		return ""
+	} else {
+		return result.ID.Hex()
+	}
+}
+
+func SaveAndUpdateWiki(wiki_info *model.Wiki) string {
+	coll := client.Database("dy").Collection("wiki")
+	var result model.WikiIndexHas
+
+	err := coll.FindOne(context.TODO(), bson.D{{"wiki_id", wiki_info.WikiId}}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+		results, err := coll.InsertOne(context.TODO(), wiki_info)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("新增wiki信息", wiki_info.Title, time.Now().Format("2006-01-02 15:04:05"))
+
+		if oid, ok := results.InsertedID.(primitive.ObjectID); ok {
+			return oid.String()
+		} else {
+			return ""
+		}
+	} else {
+		wiki_info.UpdatedTime = time.Now()
+		filter := bson.D{{"wiki_id", wiki_info.WikiId}}
+		update := bson.D{{"$set", wiki_info}}
+		_, err := coll.UpdateOne(context.TODO(), filter, update)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("更新wj信息", wiki_info.Title, time.Now().Format("2006-01-02 15:04:05"))
+	}
+
+	return result.ID.Hex()
+}
+
+func SaveWikiImageById(id, pic_path string, tag string) {
+	img_id := SaveWikiImage(pic_path, tag)
+	UpdateWikiImagePic(id, img_id)
+}
+
+func SaveWikiImage(path_url string, tag string) string {
+	if path_url == "" {
+		return ""
+	}
+
+	file_name := tag + path.Base(path_url)
+	file_id := IsHasFile(file_name)
+	if file_id != "" {
+		fmt.Println("has_file:", file_id)
+		return file_id
+	}
+	resp, _ := http.Get(path_url)
+	body, _ := ioutil.ReadAll(resp.Body)
+	contentType := http.DetectContentType(body)
+	fmt.Println(contentType)
+	insert_id := UploadFile(&body, file_name, contentType)
+	fmt.Println("插入图片", insert_id)
+	return insert_id
+}
+
+func UpdateWikiImagePic(id string, img_id string) {
+	coll := client.Database("dy").Collection("wiki")
+	id_obj, _ := primitive.ObjectIDFromHex(id)
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	result, err := coll.UpdateOne(
+		ctx,
+		bson.M{"_id": id_obj},
+		bson.D{
+			{"$set", bson.D{{"img_url", img_id}}},
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("Updated pic %v Documents!\n", result.ModifiedCount)
+}

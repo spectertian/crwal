@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -323,4 +324,117 @@ func GetContentBDAll(dy *model.BZYStruct) model.BZYStruct {
 
 	dy.DownUrl = down_Urls
 	return *dy
+}
+
+func GetDoubanDetailByUrl(wiki_id int) model.Wiki {
+	m_url := "https://movie.douban.com/subject/%v/"
+	url := fmt.Sprintf(m_url, wiki_id)
+	fmt.Println("豆瓣地址", url)
+	c_count := 0
+forStart:
+	client := &http.Client{}
+	//提交请求
+	reqest, err := http.NewRequest("GET", url, nil)
+
+	//增加header选项
+	reqest.Header.Add("Referer", "https://movie.douban.com/subject/35241052/?tag=%E7%83%AD%E9%97%A8&from=gaia")
+	reqest.Header.Add("Host", "https://search.douban.com/movie/subject_search")
+	reqest.Header.Add("Origin", "https://movie.douban.com")
+	reqest.Header.Add("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"98\", \"Google Chrome\";v=\"98\"")
+	reqest.Header.Add("sec-ch-ua-mobile", "?0")
+	reqest.Header.Add("sec-ch-ua-platform", "macOS")
+	reqest.Header.Add("Sec-Fetch-Dest", "empty")
+	reqest.Header.Add("Sec-Fetch-Mode", "cors")
+	reqest.Header.Add("Sec-Fetch-Site", "same-site")
+	reqest.Header.Add("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36")
+	reqest.Header.Add("Pragma", "no-cache")
+	reqest.Header.Add("Cookie", "no-cache")
+
+	if err != nil {
+		panic(err)
+	}
+	//处理返回结果
+	response, _ := client.Do(reqest)
+	defer response.Body.Close()
+
+	if response.StatusCode != 200 {
+		c_count = c_count + 1
+		time.Sleep(time.Second * 1)
+		fmt.Println("抓取次数：", c_count, "----", url)
+		if c_count > 3 {
+			log.Fatalf("status code error: %d %s", response.StatusCode, response.Status)
+		}
+		response.Body.Close()
+		goto forStart
+		log.Fatalf("status code error: %d %s", response.StatusCode, response.Status)
+	}
+	doc, err := goquery.NewDocumentFromReader(response.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	wiki := model.Wiki{}
+	wiki.UpdatedTime = time.Now()
+	wiki.CreatedTime = time.Now()
+	wiki.WikiId = wiki_id
+	wiki.Title = strings.TrimSpace(doc.Find("#content h1 span").Eq(0).Text())
+	year := strings.TrimSpace(doc.Find("#content h1 span").Eq(1).Text())
+	re := regexp.MustCompile("[0-9]+")
+	newY := re.FindAllString(year, -1)
+	wiki.Year, _ = strconv.Atoi(newY[0])
+	wiki.Rating, _ = strconv.ParseFloat(strings.TrimSpace(doc.Find(".rating_self .rating_num").Text()), 64)
+	info_s := strings.Replace(doc.Find("#info").Text(), " ", "", -1)
+	res := strings.Split(info_s, "\n")
+	for _, re_str := range res {
+		if re_str != "" {
+			re_str_last := strings.Split(re_str, ":")
+			switch re_str_last[0] {
+			case "导演":
+				wiki.Director = strings.Split(re_str_last[1], "/")
+				break
+			case "编剧":
+				wiki.Writes = strings.Split(re_str_last[1], "/")
+				break
+			case "主演":
+				wiki.Stars = strings.Split(re_str_last[1], "/")
+				break
+			case "类型":
+				wiki.Tags = strings.Split(re_str_last[1], "/")
+				break
+			case "制片国家/地区":
+				wiki.Area = strings.Split(re_str_last[1], "/")
+				break
+			case "语言":
+				wiki.Language = strings.Split(re_str_last[1], "/")
+				break
+			case "首播":
+				wiki.FirstPlayDate = re_str_last[1]
+				break
+			case "集数":
+				wiki.Episodes = re_str_last[1]
+				break
+			case "单集片长":
+				wiki.EpisodesTime = re_str_last[1]
+				break
+			case "片长":
+				wiki.RunTime = re_str_last[1]
+				break
+			case "又名":
+				wiki.Alias = strings.Split(re_str_last[1], "/")
+				break
+			case "IMDb":
+				wiki.IMDb = re_str_last[1]
+				break
+			default:
+				break
+			}
+		}
+	}
+
+	introduction, _ := doc.Find("#link-report span[property='v:summary']").Html()
+	wiki.Introduction = strings.TrimSpace(introduction)
+	post_image, _ := doc.Find(".nbgnbg img").Attr("src")
+	post_image = strings.Replace(post_image, "/s_ratio_poster/", "/l/", -1)
+	wiki.PostImage = strings.TrimSpace(post_image)
+	return wiki
 }
