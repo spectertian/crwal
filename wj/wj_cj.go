@@ -113,11 +113,15 @@ forStart:
 
 		vod_pay_title := strings.Split(info.VodPlayFrom, "$$$")
 		vod_pay_list := strings.Split(info.VodPlayUrl, "$$$")
+		fmt.Println(info)
 		for k, v := range vod_pay_list {
 			v_s := model.VodStruct{}
 			v_s.Title = vod_pay_title[k]
 			play_list := strings.Split(v, "#")
 			for _, u := range play_list {
+				if u == "" {
+					continue
+				}
 				p_list := strings.Split(u, "$")
 				v_s.List = append(v_s.List, model.VodPlayStruct{p_list[0], p_list[1]})
 			}

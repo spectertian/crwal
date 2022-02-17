@@ -64,8 +64,9 @@ func TestSaveLocalWiki(t *testing.T) {
 func TestGetJsonInfo(t *testing.T) {
 
 	list := []string{
-		"https://api.wujinapi.com/api.php/provide/vod/at/json?ac=detail",
-		//"https://api.wujinapi.com/api.php/provide/vod/at/json?ac=detail&ids=561",
+		//"https://api.wujinapi.com/api.php/provide/vod/at/json?ac=detail",
+		"https://api.wujinapi.com/api.php/provide/vod/at/json?ac=detail&ids=561",
+		"https://api.wujinapi.com/api.php/provide/vod/at/json?ac=detail&ids=28426",
 	}
 	for _, url := range list {
 		GetJsonInfo(url)
