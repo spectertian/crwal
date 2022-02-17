@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"sync"
 	"time"
 )
@@ -104,6 +105,26 @@ forStart:
 
 	for _, info := range m.List {
 		fmt.Println(url, info.VodId, info.VodDoubanId, info.VodName)
+		info.Director = strings.Split(info.VodDirector, ",")
+		info.Class = strings.Split(info.VodClass, ",")
+		info.Tags = strings.Split(info.VodTag, ",")
+		info.Alias = strings.Split(info.VodSub, ",")
+		info.Stars = strings.Split(info.VodActor, ",")
+
+		vod_pay_title := strings.Split(info.VodPlayFrom, "$$$")
+		vod_pay_list := strings.Split(info.VodPlayUrl, "$$$")
+		for k, v := range vod_pay_list {
+			v_s := model.VodStruct{}
+			v_s.Title = vod_pay_title[k]
+			play_list := strings.Split(v, "#")
+			for _, u := range play_list {
+				p_list := strings.Split(u, "$")
+				v_s.List = append(v_s.List, model.VodPlayStruct{p_list[0], p_list[1]})
+			}
+			info.Play = append(info.Play, v_s)
+			fmt.Println(v_s)
+		}
+
 		vod_id := db.SaveAndUpdateWj(&info)
 		if vod_id == "" {
 			fmt.Println("vod_id为空", info, vod_id)
