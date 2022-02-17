@@ -19,16 +19,16 @@ type WJVod struct {
 	VodTag           string    `bson:"vod_tag" json:"vod_tag"`
 	VodClass         string    `bson:"vod_class" json:"vod_class"`
 	VodPic           string    `bson:"vod_pic" json:"vod_pic"`
-	vodPicThumb      string    `bson:"vod_pic_thumb" json:"vod_pic_thumb"`
-	vodPicSlide      string    `bson:"vod_pic_slide" json:"vod_pic_slide"`
-	vodPicScreenshot string    `bson:"vod_pic_screenshot" json:"vod_pic_screenshot"`
-	vodActor         string    `bson:"vod_actor" json:"vod_actor"`
-	vodDirector      string    `bson:"vod_director" json:"vod_director"`
-	vodWriter        string    `bson:"vod_writer" json:"vod_writer"`
-	vodBehind        string    `bson:"vod_behind" json:"vod_behind"`
-	vodBlurb         string    `bson:"vod_blurb" json:"vod_blurb"`
-	vodRemarks       string    `bson:"vod_remarks" json:"vod_remarks"`
-	vodPubdate       string    `bson:"vod_pubdate" json:"vod_pubdate"`
+	VodPicThumb      string    `bson:"vod_pic_thumb" json:"vod_pic_thumb"`
+	VodPicSlide      string    `bson:"vod_pic_slide" json:"vod_pic_slide"`
+	VodPicScreenshot string    `bson:"vod_pic_screenshot" json:"vod_pic_screenshot"`
+	VodActor         string    `bson:"vod_actor" json:"vod_actor"`
+	VodDirector      string    `bson:"vod_director" json:"vod_director"`
+	VodWriter        string    `bson:"vod_writer" json:"vod_writer"`
+	VodBehind        string    `bson:"vod_behind" json:"vod_behind"`
+	VodBlurb         string    `bson:"vod_blurb" json:"vod_blurb"`
+	VodRemarks       string    `bson:"vod_remarks" json:"vod_remarks"`
+	VodPubdate       string    `bson:"vod_pubdate" json:"vod_pubdate"`
 	VodTotal         int       `bson:"vod_total" json:"vod_total"`
 	VodSerial        string    `bson:"vod_serial" json:"vod_serial"`
 	VodTv            string    `bson:"vod_tv" json:"vod_tv"`
