@@ -126,3 +126,12 @@ else
 	exit -1;
 fi
 
+cd $cur_dir
+cd wj_up
+go build -o wj_up wj_up.go
+if [ $? -eq 0 ]; then
+	echo "build wj_up ok!"
+else
+	echo "build wj_up false!"
+	exit -1;
+fi
