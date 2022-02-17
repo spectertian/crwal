@@ -453,7 +453,7 @@ func GetDoubanHtmlDetailByUrl(wiki_id int) model.Wiki {
 	url := fmt.Sprintf(m_url, wiki_id)
 	fmt.Println("豆瓣地址", url)
 
-	htmlContent, err := GetHttpHtmlContent(m_url, "html", "document.querySelector(\"body\")")
+	htmlContent, err := GetHttpHtmlContent(m_url, "#download", "document.querySelector(\"body\")")
 
 	fmt.Println("xxxx", htmlContent)
 	fmt.Println("err", err)
