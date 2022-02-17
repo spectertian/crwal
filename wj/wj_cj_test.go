@@ -53,6 +53,7 @@ func TestSaveLocalWiki(t *testing.T) {
 
 	list := []int{
 		26928226,
+		35698677,
 	}
 	for _, id := range list {
 		SaveLocalWiki(id)

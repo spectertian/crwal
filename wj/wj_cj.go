@@ -121,7 +121,8 @@ func SaveLocalWiki(id int) {
 	if id == 0 {
 		return
 	}
-	wiki_id := db.IsHasWiki(id)
+	//wiki_id := db.IsHasWiki(id)
+	wiki_id := ""
 	if wiki_id == "" {
 		wikis := util.GetDoubanHtmlDetailByUrl(id)
 		if wikis.WikiId == 0 {
