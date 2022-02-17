@@ -327,7 +327,7 @@ func GetContentBDAll(dy *model.BZYStruct) model.BZYStruct {
 }
 
 func GetDoubanDetailByUrl(wiki_id int) model.Wiki {
-	m_url := "https://movie.douban.com/subject/%v/"
+	m_url := "https://movie.douban.com/subject/%v/?from=showing"
 	url := fmt.Sprintf(m_url, wiki_id)
 	fmt.Println("豆瓣地址", url)
 	c_count := 0
@@ -368,6 +368,7 @@ forStart:
 			//log.Fatalf("status code error: %d %s", response.StatusCode, response.Status)
 		}
 		response.Body.Close()
+		time.Sleep(time.Second * 2)
 		goto forStart
 		//log.Fatalf("status code error: %d %s", response.StatusCode, response.Status)
 	}
@@ -449,11 +450,11 @@ forStart:
 	return wiki
 }
 func GetDoubanHtmlDetailByUrl(wiki_id int) model.Wiki {
-	m_url := "https://movie.douban.com/subject/%v/"
+	m_url := "https://movie.douban.com/subject/%v/?from=showing"
 	url := fmt.Sprintf(m_url, wiki_id)
 	fmt.Println("豆瓣地址", url)
 
-	htmlContent, err := GetHttpHtmlContent(m_url, "body", "document.querySelector(\"body\")")
+	htmlContent, err := GetHttpHtmlContent(m_url, "html", "document.querySelector(\"body\")")
 
 	fmt.Println("xxxx", htmlContent)
 	fmt.Println("err", err)
