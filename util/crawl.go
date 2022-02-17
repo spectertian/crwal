@@ -331,6 +331,7 @@ func GetDoubanDetailByUrl(wiki_id int) model.Wiki {
 	url := fmt.Sprintf(m_url, wiki_id)
 	fmt.Println("豆瓣地址", url)
 	c_count := 0
+
 forStart:
 	client := &http.Client{}
 	//提交请求
@@ -355,7 +356,6 @@ forStart:
 	}
 	//处理返回结果
 	response, _ := client.Do(reqest)
-	defer response.Body.Close()
 
 	if response.StatusCode != 200 {
 		c_count = c_count + 1
@@ -364,6 +364,7 @@ forStart:
 		if c_count > 3 {
 			wiki := model.Wiki{}
 			wiki.WikiId = 0
+			response.Body.Close()
 			return wiki
 			//log.Fatalf("status code error: %d %s", response.StatusCode, response.Status)
 		}
@@ -386,6 +387,7 @@ forStart:
 	if wiki.Title == "" {
 		wiki := model.Wiki{}
 		wiki.WikiId = 0
+		response.Body.Close()
 		return wiki
 	}
 
@@ -447,6 +449,7 @@ forStart:
 	post_image, _ := doc.Find(".nbgnbg img").Attr("src")
 	post_image = strings.Replace(post_image, "/s_ratio_poster/", "/l/", -1)
 	wiki.PostImage = strings.TrimSpace(post_image)
+	response.Body.Close()
 	return wiki
 }
 func GetDoubanHtmlDetailByUrl(wiki_id int) model.Wiki {
