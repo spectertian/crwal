@@ -30,6 +30,7 @@ type Wiki struct {
 }
 
 type WikiIndexHas struct {
-	ID     primitive.ObjectID `bson:"_id" json:"id,omitempty"`
-	WikiId int                `json:"wiki_id"`
+	ID          primitive.ObjectID `bson:"_id" json:"id,omitempty"`
+	WikiId      int                `json:"wiki_id"`
+	CreatedTime time.Time          `bson:"created_time"`
 }

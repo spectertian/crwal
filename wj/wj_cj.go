@@ -14,7 +14,6 @@ import (
 	"time"
 )
 
-var Domin = "https://www.tiankongzy.com"
 var wg sync.WaitGroup
 var PageCount = 0
 
@@ -97,27 +96,38 @@ forStart:
 
 	var m model.JsonResult
 
-	fmt.Println(string(body))
+	//fmt.Println(string(body))
 	if err := json.Unmarshal(body, &m); err != nil {
+		fmt.Println("err", err)
 		log.Fatal(m)
 	}
 
 	for _, info := range m.List {
+		fmt.Println(url, info.VodId, info.VodDoubanId, info.VodName)
 		vod_id := db.SaveAndUpdateWj(&info)
-
 		if vod_id == "" {
 			fmt.Println("vod_id为空", info, vod_id)
 			return
 		}
 		db.SaveVodImageById(vod_id, info.VodPic, "wj_")
-		//SaveLocalWiki(info.VodDoubanId)
+		if info.VodDoubanId > 0 {
+			SaveLocalWiki(info.VodDoubanId)
+		}
 	}
+	return
 }
 
 func SaveLocalWiki(id int) {
+	if id == 0 {
+		return
+	}
 	wiki_id := db.IsHasWiki(id)
 	if wiki_id == "" {
 		wikis := util.GetDoubanDetailByUrl(id)
+		if wikis.WikiId == 0 {
+			fmt.Println("wiki：", id, "抓取失败")
+			return
+		}
 		insert_id := db.SaveWiki(&wikis)
 		if insert_id == "" {
 			fmt.Println("wiki insert_id为空")
@@ -133,16 +143,15 @@ func main() {
 	fmt.Println("抓取开始", time.Now().Format("2006-01-02 15:04:05"))
 	url := "https://api.wujinapi.com/api.php/provide/vod/at/json?ac=detail&pg=%v"
 	starts := time.Now().Unix()
-	fmt.Println(url)
 	SetPageCounts()
 	fmt.Println("总页数：", PageCount)
 
 	if PageCount < 1 {
-
 		fmt.Println("采集的数据太少")
 		os.Exit(1)
 
 	}
+
 	GetFetchListUrl(url)
 	ends := time.Now().Unix()
 
@@ -152,6 +161,7 @@ func main() {
 
 func SetPageCounts() {
 	url := "https://api.wujinapi.com/api.php/provide/vod/at/json?ac=detail"
+	fmt.Println(url)
 	res, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
@@ -170,10 +180,10 @@ func SetPageCounts() {
 
 	var m model.JsonResult
 
-	fmt.Println(string(body))
+	//fmt.Println(string(body))
 	if err := json.Unmarshal(body, &m); err != nil {
+		fmt.Println("count_err", err)
 		log.Fatal(m)
 	}
-
 	PageCount = m.PageCount
 }

@@ -362,11 +362,14 @@ forStart:
 		time.Sleep(time.Second * 1)
 		fmt.Println("抓取次数：", c_count, "----", url)
 		if c_count > 3 {
-			log.Fatalf("status code error: %d %s", response.StatusCode, response.Status)
+			wiki := model.Wiki{}
+			wiki.WikiId = 0
+			return wiki
+			//log.Fatalf("status code error: %d %s", response.StatusCode, response.Status)
 		}
 		response.Body.Close()
 		goto forStart
-		log.Fatalf("status code error: %d %s", response.StatusCode, response.Status)
+		//log.Fatalf("status code error: %d %s", response.StatusCode, response.Status)
 	}
 	doc, err := goquery.NewDocumentFromReader(response.Body)
 	if err != nil {
@@ -378,6 +381,13 @@ forStart:
 	wiki.CreatedTime = time.Now()
 	wiki.WikiId = wiki_id
 	wiki.Title = strings.TrimSpace(doc.Find("#content h1 span").Eq(0).Text())
+
+	if wiki.Title == "" {
+		wiki := model.Wiki{}
+		wiki.WikiId = 0
+		return wiki
+	}
+
 	year := strings.TrimSpace(doc.Find("#content h1 span").Eq(1).Text())
 	re := regexp.MustCompile("[0-9]+")
 	newY := re.FindAllString(year, -1)

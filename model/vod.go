@@ -94,16 +94,17 @@ type WJVod struct {
 	CreatedTime      time.Time `bson:"created_time"`
 }
 type JsonResult struct {
-	Code      int     `json:"code"`
-	Msg       string  `json:"msg"`
-	Page      int     `json:"page"`
-	PageCount int     `json:"pagecount"`
-	Limit     string  `json:"limit"`
-	Total     int     `json:"total"`
-	List      []WJVod `json:"list"`
+	Code      int         `json:"code"`
+	Msg       string      `json:"msg"`
+	Page      interface{} `json:"page"`
+	PageCount int         `json:"pagecount"`
+	Limit     string      `json:"limit"`
+	Total     int         `json:"total"`
+	List      []WJVod     `json:"list"`
 }
 
 type VodIndexHas struct {
 	ID          primitive.ObjectID `bson:"_id" json:"id,omitempty"`
 	VodDoubanId int                `json:"vod_douban_id"`
+	CreatedTime time.Time          `bson:"created_time"`
 }

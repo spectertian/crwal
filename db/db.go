@@ -673,6 +673,8 @@ func SaveAndUpdateWj(wj_vod *model.WJVod) string {
 		}
 	} else {
 		wj_vod.UpdatedTime = time.Now()
+		wj_vod.CreatedTime = result.CreatedTime
+
 		if result.VodDoubanId > 0 {
 			wj_vod.VodDoubanId = result.VodDoubanId
 		}
@@ -784,6 +786,7 @@ func SaveAndUpdateWiki(wiki_info *model.Wiki) string {
 		}
 	} else {
 		wiki_info.UpdatedTime = time.Now()
+		wiki_info.CreatedTime = result.CreatedTime
 		filter := bson.D{{"wiki_id", wiki_info.WikiId}}
 		update := bson.D{{"$set", wiki_info}}
 		_, err := coll.UpdateOne(context.TODO(), filter, update)

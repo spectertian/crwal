@@ -69,3 +69,12 @@ func TestGetJsonInfo(t *testing.T) {
 		GetJsonInfo(url)
 	}
 }
+
+func TestStruct(*testing.T) {
+
+	type As struct {
+		a string
+		b string
+	}
+
+}
