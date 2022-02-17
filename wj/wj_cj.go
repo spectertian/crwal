@@ -122,9 +122,13 @@ forStart:
 				if u == "" {
 					continue
 				}
-				p_list := strings.Split(u, "$")
-				fmt.Println(u, p_list, info.VodId)
-				v_s.List = append(v_s.List, model.VodPlayStruct{p_list[0], p_list[1]})
+				res1 := strings.Contains(u, "$")
+				if res1 {
+					p_list := strings.Split(u, "$")
+					v_s.List = append(v_s.List, model.VodPlayStruct{p_list[0], p_list[1]})
+				} else {
+					v_s.List = append(v_s.List, model.VodPlayStruct{"_", u})
+				}
 			}
 			info.Play = append(info.Play, v_s)
 		}
