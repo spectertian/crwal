@@ -123,6 +123,7 @@ forStart:
 					continue
 				}
 				p_list := strings.Split(u, "$")
+				fmt.Println(u, p_list, info.VodId)
 				v_s.List = append(v_s.List, model.VodPlayStruct{p_list[0], p_list[1]})
 			}
 			info.Play = append(info.Play, v_s)
