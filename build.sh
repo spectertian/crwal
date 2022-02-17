@@ -118,11 +118,11 @@ fi
 
 cd $cur_dir
 cd wj
-go build -o wi_cj wi_cj.go
+go build -o wj_cj wj_cj.go
 if [ $? -eq 0 ]; then
-	echo "build wi_cj ok!"
+	echo "build wj_cj ok!"
 else
-	echo "build wi_cj false!"
+	echo "build wj_cj false!"
 	exit -1;
 fi
 
