@@ -110,9 +110,9 @@ forStart:
 			return
 		}
 		db.SaveVodImageById(vod_id, info.VodPic, "wj_")
-		if info.VodDoubanId > 0 {
-			SaveLocalWiki(info.VodDoubanId)
-		}
+		//if info.VodDoubanId > 0 {
+		//	SaveLocalWiki(info.VodDoubanId)
+		//}
 	}
 	return
 }
