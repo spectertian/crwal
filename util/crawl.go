@@ -448,3 +448,89 @@ forStart:
 	wiki.PostImage = strings.TrimSpace(post_image)
 	return wiki
 }
+func GetDoubanHtmlDetailByUrl(wiki_id int) model.Wiki {
+	m_url := "https://movie.douban.com/subject/%v/"
+	url := fmt.Sprintf(m_url, wiki_id)
+	fmt.Println("豆瓣地址", url)
+
+	htmlContent, _ := GetHttpHtmlContent(m_url, "html", "document.querySelector(\"body\")")
+	// Load the HTML document
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlContent))
+	if err != nil {
+		wiki := model.Wiki{}
+		wiki.WikiId = 0
+		return wiki
+	}
+
+	wiki := model.Wiki{}
+	wiki.UpdatedTime = time.Now()
+	wiki.CreatedTime = time.Now()
+	wiki.WikiId = wiki_id
+	wiki.Title = strings.TrimSpace(doc.Find("#content h1 span").Eq(0).Text())
+
+	if wiki.Title == "" {
+		wiki := model.Wiki{}
+		wiki.WikiId = 0
+		return wiki
+	}
+
+	year := strings.TrimSpace(doc.Find("#content h1 span").Eq(1).Text())
+	re := regexp.MustCompile("[0-9]+")
+	newY := re.FindAllString(year, -1)
+	wiki.Year, _ = strconv.Atoi(newY[0])
+	wiki.Rating, _ = strconv.ParseFloat(strings.TrimSpace(doc.Find(".rating_self .rating_num").Text()), 64)
+	info_s := strings.Replace(doc.Find("#info").Text(), " ", "", -1)
+	res := strings.Split(info_s, "\n")
+	for _, re_str := range res {
+		if re_str != "" {
+			re_str_last := strings.Split(re_str, ":")
+			switch re_str_last[0] {
+			case "导演":
+				wiki.Director = strings.Split(re_str_last[1], "/")
+				break
+			case "编剧":
+				wiki.Writes = strings.Split(re_str_last[1], "/")
+				break
+			case "主演":
+				wiki.Stars = strings.Split(re_str_last[1], "/")
+				break
+			case "类型":
+				wiki.Tags = strings.Split(re_str_last[1], "/")
+				break
+			case "制片国家/地区":
+				wiki.Area = strings.Split(re_str_last[1], "/")
+				break
+			case "语言":
+				wiki.Language = strings.Split(re_str_last[1], "/")
+				break
+			case "首播":
+				wiki.FirstPlayDate = re_str_last[1]
+				break
+			case "集数":
+				wiki.Episodes = re_str_last[1]
+				break
+			case "单集片长":
+				wiki.EpisodesTime = re_str_last[1]
+				break
+			case "片长":
+				wiki.RunTime = re_str_last[1]
+				break
+			case "又名":
+				wiki.Alias = strings.Split(re_str_last[1], "/")
+				break
+			case "IMDb":
+				wiki.IMDb = re_str_last[1]
+				break
+			default:
+				break
+			}
+		}
+	}
+
+	introduction, _ := doc.Find("#link-report span[property='v:summary']").Html()
+	wiki.Introduction = strings.TrimSpace(introduction)
+	post_image, _ := doc.Find(".nbgnbg img").Attr("src")
+	post_image = strings.Replace(post_image, "/s_ratio_poster/", "/l/", -1)
+	wiki.PostImage = strings.TrimSpace(post_image)
+	return wiki
+}
