@@ -145,3 +145,13 @@ else
 	echo "build f_cj false!"
 	exit -1;
 fi
+
+cd $cur_dir
+cd f_cj_up
+go build -o f_cj_up f_cj_up.go
+if [ $? -eq 0 ]; then
+	echo "build f_cj_up ok!"
+else
+	echo "build f_cj_up false!"
+	exit -1;
+fi
