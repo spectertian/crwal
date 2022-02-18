@@ -11,20 +11,20 @@ import (
 	"time"
 )
 
-func SaveAndUpdateFj(wj_vod *model.WJVod) string {
+func SaveAndUpdateFj(vod *model.WJVod) string {
 	coll := client.Database("dy").Collection("vod_fj_list")
 	var result model.VodIndexHas
 
-	err := coll.FindOne(context.TODO(), bson.D{{"vod_id", wj_vod.VodId}}).Decode(&result)
+	err := coll.FindOne(context.TODO(), bson.D{{"vod_id", vod.VodId}}).Decode(&result)
 	if err == mongo.ErrNoDocuments {
 
-		wj_vod.UpdatedTime = time.Now()
-		wj_vod.CreatedTime = time.Now()
-		results, err := coll.InsertOne(context.TODO(), wj_vod)
+		vod.UpdatedTime = time.Now()
+		vod.CreatedTime = time.Now()
+		results, err := coll.InsertOne(context.TODO(), vod)
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println("新增wj信息", wj_vod.VodName, time.Now().Format("2006-01-02 15:04:05"))
+		fmt.Println("新增wj信息", vod.VodName, time.Now().Format("2006-01-02 15:04:05"))
 
 		if oid, ok := results.InsertedID.(primitive.ObjectID); ok {
 			return oid.Hex()
@@ -32,19 +32,19 @@ func SaveAndUpdateFj(wj_vod *model.WJVod) string {
 			return ""
 		}
 	} else {
-		wj_vod.UpdatedTime = time.Now()
-		wj_vod.CreatedTime = result.CreatedTime
+		vod.UpdatedTime = time.Now()
+		vod.CreatedTime = result.CreatedTime
 
 		if result.VodDoubanId > 0 {
-			wj_vod.VodDoubanId = result.VodDoubanId
+			vod.VodDoubanId = result.VodDoubanId
 		}
-		filter := bson.D{{"vod_id", wj_vod.VodId}}
-		update := bson.D{{"$set", wj_vod}}
+		filter := bson.D{{"vod_id", vod.VodId}}
+		update := bson.D{{"$set", vod}}
 		_, err := coll.UpdateOne(context.TODO(), filter, update)
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println("更新wj信息", wj_vod.VodName, time.Now().Format("2006-01-02 15:04:05"))
+		fmt.Println("更新wj信息", vod.VodName, time.Now().Format("2006-01-02 15:04:05"))
 	}
 
 	return result.ID.Hex()
