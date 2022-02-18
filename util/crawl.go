@@ -349,7 +349,6 @@ forStart:
 	reqest.Header.Add("Sec-Fetch-Site", "same-site")
 	reqest.Header.Add("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.80 Safari/537.36")
 	reqest.Header.Add("Pragma", "no-cache")
-	reqest.Header.Add("Cookie", "no-cache")
 
 	if err != nil {
 		panic(err)
