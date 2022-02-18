@@ -138,20 +138,20 @@ fi
 
 cd $cur_dir
 cd f_cj
-go build -o f_cj f_cj.go
+go build -o fc_cj fc_cj.go
 if [ $? -eq 0 ]; then
-	echo "build f_cj ok!"
+	echo "build fc_cj ok!"
 else
-	echo "build f_cj false!"
+	echo "build fc_cj false!"
 	exit -1;
 fi
 
 cd $cur_dir
 cd f_cj_up
-go build -o f_cj_up f_cj_up.go
+go build -o fc_cj_up fc_cj_up.go
 if [ $? -eq 0 ]; then
-	echo "build f_cj_up ok!"
+	echo "build fc_cj_up ok!"
 else
-	echo "build f_cj_up false!"
+	echo "build fc_cj_up false!"
 	exit -1;
 fi
