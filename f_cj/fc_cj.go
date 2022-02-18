@@ -113,23 +113,32 @@ forStart:
 
 		vod_pay_title := strings.Split(info.VodPlayFrom, "$$$")
 		vod_pay_list := strings.Split(info.VodPlayUrl, "$$$")
+		fmt.Println(info)
 		for k, v := range vod_pay_list {
 			v_s := model.VodStruct{}
 			v_s.Title = vod_pay_title[k]
 			play_list := strings.Split(v, "#")
 			for _, u := range play_list {
-				p_list := strings.Split(u, "$")
-				v_s.List = append(v_s.List, model.VodPlayStruct{p_list[0], p_list[1]})
+				if u == "" {
+					continue
+				}
+				res1 := strings.Contains(u, "$")
+				if res1 {
+					p_list := strings.Split(u, "$")
+					v_s.List = append(v_s.List, model.VodPlayStruct{p_list[0], p_list[1]})
+				} else {
+					v_s.List = append(v_s.List, model.VodPlayStruct{"_", u})
+				}
 			}
 			info.Play = append(info.Play, v_s)
 		}
 
-		vod_id := db.SaveAndUpdateWj(&info)
+		vod_id := db.SaveAndUpdateFj(&info)
 		if vod_id == "" {
 			fmt.Println("vod_id为空", info, vod_id)
 			return
 		}
-		db.SaveVodImageById(vod_id, info.VodPic, "wj_")
+		db.SaveVodImageFjById(vod_id, info.VodPic, "fj_")
 		//if info.VodDoubanId > 0 {
 		//	SaveLocalWiki(info.VodDoubanId)
 		//}
@@ -161,7 +170,7 @@ func SaveLocalWiki(id int) {
 
 func main() {
 	fmt.Println("抓取开始", time.Now().Format("2006-01-02 15:04:05"))
-	url := "https://api.wujinapi.com/api.php/provide/vod/at/json?ac=detail&h=25&pg=%v"
+	url := "https://demo.if101.tv/api.php/provide/vod/at/json?ac=detail&pg=%v"
 	starts := time.Now().Unix()
 	SetPageCounts()
 	fmt.Println("总页数：", PageCount)
@@ -180,7 +189,7 @@ func main() {
 }
 
 func SetPageCounts() {
-	url := "https://api.wujinapi.com/api.php/provide/vod/at/json?ac=detail&h=25"
+	url := "https://demo.if101.tv/api.php/provide/vod/at/json?ac=detail"
 	fmt.Println(url)
 	res, err := http.Get(url)
 	if err != nil {
