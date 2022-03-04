@@ -76,9 +76,24 @@ func TestGetJsonInfo(t *testing.T) {
 
 func TestStruct(*testing.T) {
 
-	type As struct {
-		a string
-		b string
+	ss := []string{}
+
+	ss = append(ss, "99")
+	ss = append(ss, "344")
+	ss = append(ss, "100")
+	ss = append(ss, "25")
+
+	q := map[int]string{}
+	q[1] = "3"
+	q[2] = "4"
+	q[4] = "1"
+
+	for k, v := range ss {
+		fmt.Println(k, v)
+	}
+
+	for _, v := range q {
+		fmt.Println(v)
 	}
 
 }
