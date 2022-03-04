@@ -3,7 +3,6 @@ package main
 import (
 	"crwal/db"
 	"crwal/model"
-	"crwal/util"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -82,7 +81,7 @@ forStart:
 		fmt.Println("抓取次数：", c_count, "----", url)
 		if c_count > 3 {
 			res.Body.Close()
-			fmt.Println("wj抓取失败")
+			fmt.Println("ab抓取失败")
 			return
 		}
 		res.Body.Close()
@@ -133,12 +132,12 @@ forStart:
 			info.Play = append(info.Play, v_s)
 		}
 
-		vod_id := db.SaveAndUpdateWj(&info)
+		vod_id := db.SaveAndUpdateAb(&info)
 		if vod_id == "" {
 			fmt.Println("vod_id为空", info, vod_id)
 			return
 		}
-		db.SaveVodImageById(vod_id, info.VodPic, "wj_")
+		db.SaveVodAbImageById(vod_id, info.VodPic, "ab_")
 		//if info.VodDoubanId > 0 {
 		//	SaveLocalWiki(info.VodDoubanId)
 		//}
@@ -146,31 +145,9 @@ forStart:
 	return
 }
 
-func SaveLocalWiki(id int) {
-	if id == 0 {
-		return
-	}
-	wiki_id := db.IsHasWiki(id)
-	if wiki_id == "" {
-		wikis := util.GetDoubanDetailByUrl(id)
-		if wikis.WikiId == 0 {
-			fmt.Println("wiki：", id, "抓取失败")
-			return
-		}
-		insert_id := db.SaveWiki(&wikis)
-		if insert_id == "" {
-			fmt.Println("wiki insert_id为空")
-			return
-		}
-		db.SaveWikiImageById(insert_id, wikis.PostImage, "wiki_")
-	} else {
-		fmt.Println("已存在wiki", id)
-	}
-}
-
 func main() {
 	fmt.Println("抓取开始", time.Now().Format("2006-01-02 15:04:05"))
-	url := "https://api.wujinapi.com/api.php/provide/vod/at/json?ac=detail&pg=%v"
+	url := "https://cj.apiabzy.com/api.php/provide/vod/?ac=detail&pg=%v"
 	starts := time.Now().Unix()
 	SetPageCounts()
 	fmt.Println("总页数：", PageCount)
@@ -189,7 +166,7 @@ func main() {
 }
 
 func SetPageCounts() {
-	url := "https://api.wujinapi.com/api.php/provide/vod/at/json?ac=detail"
+	url := "https://cj.apiabzy.com/api.php/provide/vod/?ac=detail"
 	fmt.Println(url)
 	res, err := http.Get(url)
 	if err != nil {
