@@ -155,3 +155,23 @@ else
 	echo "build fc_cj_up false!"
 	exit -1;
 fi
+
+cd $cur_dir
+cd ab
+go build -o ab_cj ab_cj.go
+if [ $? -eq 0 ]; then
+	echo "build ab_cj ok!"
+else
+	echo "build ab_cj false!"
+	exit -1;
+fi
+
+cd $cur_dir
+cd ab_up
+go build -o ab_up ab_up.go
+if [ $? -eq 0 ]; then
+	echo "build ab_up ok!"
+else
+	echo "build ab_up false!"
+	exit -1;
+fi
