@@ -118,8 +118,16 @@ forStart:
 			v_s.Title = vod_pay_title[k]
 			play_list := strings.Split(v, "#")
 			for _, u := range play_list {
-				p_list := strings.Split(u, "$")
-				v_s.List = append(v_s.List, model.VodPlayStruct{p_list[0], p_list[1]})
+				if u == "" {
+					continue
+				}
+				res1 := strings.Contains(u, "$")
+				if res1 {
+					p_list := strings.Split(u, "$")
+					v_s.List = append(v_s.List, model.VodPlayStruct{p_list[0], p_list[1]})
+				} else {
+					v_s.List = append(v_s.List, model.VodPlayStruct{"_", u})
+				}
 			}
 			info.Play = append(info.Play, v_s)
 		}

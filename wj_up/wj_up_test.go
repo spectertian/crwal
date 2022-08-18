@@ -28,7 +28,8 @@ func TestGetContentBDAll(t *testing.T) {
 }
 
 func TestSetPageCounts(t *testing.T) {
-	url := "https://api.wujinapi.com/api.php/provide/vod/at/json?ac=detail"
+	//url := "https://api.wujinapi.com/api.php/provide/vod/at/json?ac=detail"
+	url := "https://api.wujinapi.com/api.php/provide/vod/at/json?ac=detail&h=300&pg=11"
 	GetJsonInfo(url)
 
 }

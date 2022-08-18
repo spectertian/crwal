@@ -4,6 +4,7 @@ import (
 	"crwal/db"
 	"crwal/model"
 	"fmt"
+	"github.com/PuerkitoBio/goquery"
 	"log"
 	"net/http"
 	"os"
@@ -12,8 +13,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/PuerkitoBio/goquery"
 )
 
 var Domin = "https://www.tiankongzy.com"
