@@ -161,7 +161,7 @@ func SaveLocalWiki(id int) {
 
 func main() {
 	fmt.Println("抓取开始", time.Now().Format("2006-01-02 15:04:05"))
-	url := "https://cj.apiabzy.com/api.php/provide/vod/?ac=detail&h=25&pg=%v"
+	url := "http://cj.apiabzy.com/api.php/provide/vod/?ac=detail&h=25&pg=%v"
 	starts := time.Now().Unix()
 	SetPageCounts()
 	fmt.Println("总页数：", PageCount)
@@ -180,7 +180,7 @@ func main() {
 }
 
 func SetPageCounts() {
-	url := "https://cj.apiabzy.com/api.php/provide/vod/?ac=detail&h=25"
+	url := "http://cj.apiabzy.com/api.php/provide/vod/?ac=detail&h=25"
 	fmt.Println(url)
 	res, err := http.Get(url)
 	if err != nil {
