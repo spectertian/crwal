@@ -903,3 +903,42 @@ func UpdateVodAbImagePic(id string, img_id string) {
 	//fmt.Println(err)
 	fmt.Printf("Updated pic %v Documents!\n", result.ModifiedCount)
 }
+
+func SaveAndUpdateLZ(wj_vod *model.WJVod) string {
+	coll := client.Database("dy").Collection("vod_lz_list")
+	var result model.VodIndexHas
+
+	err := coll.FindOne(context.TODO(), bson.D{{"vod_id", wj_vod.VodId}}).Decode(&result)
+	if err == mongo.ErrNoDocuments {
+
+		wj_vod.UpdatedTime = time.Now()
+		wj_vod.CreatedTime = time.Now()
+		results, err := coll.InsertOne(context.TODO(), wj_vod)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("新增lz信息", wj_vod.VodName, time.Now().Format("2006-01-02 15:04:05"))
+
+		if oid, ok := results.InsertedID.(primitive.ObjectID); ok {
+			return oid.Hex()
+		} else {
+			return ""
+		}
+	} else {
+		wj_vod.UpdatedTime = time.Now()
+		wj_vod.CreatedTime = result.CreatedTime
+
+		if result.VodDoubanId > 0 {
+			wj_vod.VodDoubanId = result.VodDoubanId
+		}
+		filter := bson.D{{"vod_id", wj_vod.VodId}}
+		update := bson.D{{"$set", wj_vod}}
+		_, err := coll.UpdateOne(context.TODO(), filter, update)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("更新lz信息", wj_vod.VodName, time.Now().Format("2006-01-02 15:04:05"))
+	}
+
+	return result.ID.Hex()
+}

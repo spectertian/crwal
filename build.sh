@@ -175,3 +175,23 @@ else
 	echo "build ab_up false!"
 	exit -1;
 fi
+
+cd $cur_dir
+cd lz
+go build -o lz_cj lz_cj.go
+if [ $? -eq 0 ]; then
+	echo "build lz_cj ok!"
+else
+	echo "build lz_cj false!"
+	exit -1;
+fi
+
+cd $cur_dir
+cd lz_up
+go build -o lz_up lz_up.go
+if [ $? -eq 0 ]; then
+	echo "build lz_up ok!"
+else
+	echo "build lz_up false!"
+	exit -1;
+fi
